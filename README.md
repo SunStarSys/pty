@@ -4,7 +4,7 @@ pty is a portable pseudoterminal interface written in C but works well with
 code written other programming languages.  It has the basic functionality of
 TCL's `expect` but without the TCL dependency.
 
-See the pty-driver.pl script for commentary on how pty works for coprocessing
+See the pty_driver.pm script for commentary on how pty works for coprocessing
 (driving applications with other applications with an intermediary terminal).
 
 ```
