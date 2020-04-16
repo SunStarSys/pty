@@ -29,6 +29,8 @@ install:all
 	    && sudo cpan install IO::Select Term::ReadKey) \
 	|| (echo "Installation Failed!" >&2 && false)
 
+	@ pkill pty-agent && ./pty-agent || sudo pip3 install setproctitle
+
 	cp -f ${PROG} ${SCRIPTS} ~/bin
 
 clean:
