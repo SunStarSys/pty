@@ -180,7 +180,7 @@ sub prompt ($) {
     ReadMode noecho => $mterm;
     no warnings 'uninitialized';
     chomp(my $passwd = ReadLine 0, $mterm);
-    write_master "\n";
+    write_master "\r\n";
 
     defined $passwd or die "Operation aborted\n";
     return $passwd;
@@ -317,7 +317,6 @@ sub drive (&) {
     my $custom_handler   = shift;
     my $s                = IO::Select->new(\*STDIN, $mterm // \*STDERR);
     my $ss               = IO::Select->new(\*STDIN);
-    my $clear            = `clear`; # clears screen
 
     # toggle to deactivate automatic responses from this script when true
     my $disabled         = 0;
@@ -335,21 +334,23 @@ sub drive (&) {
                 write_master; # writes SLAVE output in $_ to MASTER terminal
                               # so we can see it.
 
-                if (index($_, $clear) >= 0) { # the SLAVE is clearing the screen
-                    read_input_nb $r and write_master;
-                }
-                elsif (/\btoggle $script_name\s*(on|off)?/) {
+                if (/^$PREFIX_RE\Qtoggle \E$script_name( on| off)?/ and substr($_, -4) eq "[27m") {
                     # alias toggle='true' in your shell's rc script to play nice
                     # otherwise the shell will attempt to run a toggle command
                     # as-is since we already sent this input to the SLAVE's
                     # terminal. this isn't required just good hygiene when
                     # working with it.
+                    my $state;
+
                     if ($1) {
-                        $disabled = $1 eq "off" ? 1 : 0;
+                        $disabled = $1 eq " off" ? 1 : 0;
+                        $state = $1;
                     }
                     else {
                         $disabled = !$disabled;
+                        $state = $disabled ? " off" : " on";
                     }
+                    write_master "$script_name toggled$state.\r\n";
                 }
                 elsif ($disabled) {
                     # prevent any further driver processing
