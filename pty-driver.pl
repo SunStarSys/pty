@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 #
 # pty driver customized for SYSTEM "Password:" and SSH prompt
+# SPDX License Identifier: Apache License 2.0
 
 use strict;
 use warnings FATAL => 'all';

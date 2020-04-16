@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX License Identifier: Apache License 2.0
 
 append=0
 quiet=0
@@ -16,7 +17,7 @@ while [ -n "$1" -a "`echo $1 | cut -d- -f1`" == "" ]; do
 done
 
 file=${1:-typescript}
-cmd=${2:-"$SHELL"}
+cmd=${2:-$SHELL}
 shift
 shift
 

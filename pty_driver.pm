@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # generic pty driver
-#
+# SPDX License Identifier: Apache License 2.0
 
 use strict;
 use warnings FATAL => 'all';
