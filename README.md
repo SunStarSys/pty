@@ -1,23 +1,24 @@
 pty is a portable pseudoterminal interface written in C but works well with
 code written other programming languages.  It has the basic functionality of
-TCL's `expect` but without the TCL dependency.  
+TCL's `expect` but without the TCL dependency.
 
 See the pty-driver.pl script for commentary on how pty works for coprocessing
 (driving applications with other applications with an intermediary terminal).
 
-% pty -h
-Usage: pty [ -d driver -einvVh -t timeout ] -- program [ arg ... ]
-Options
--------
-  -d (cmd) Driver/coprocess for passed program
-  -e       Noecho for slave pty's line discipline
-  -i       Ignore EOF on stdin
-  -n       Non interactive mode
-  -v       Verbose
-  -t (sec) Delay initial read from stdin for a clean pty setup (default=1)
-  -h       This help menu
-  -V       Version
-
+```
+    % pty -h
+    Usage: pty [ -d driver -einvVh -t timeout ] -- program [ arg ... ]
+    Options
+    -------
+      -d (cmd) Driver/coprocess for passed program
+      -e       Noecho for slave pty's line discipline
+      -i       Ignore EOF on stdin
+      -n       Non interactive mode
+      -v       Verbose
+      -t (sec) Delay initial read from stdin for a clean pty setup (default=1)
+      -h       This help menu
+      -V       Version
+```
 
 # INSTRUCTIONS:
 
