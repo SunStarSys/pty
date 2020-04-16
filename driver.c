@@ -29,7 +29,7 @@ do_driver(char *driver)
             err_sys("dup2 error to stdout");
         close(pipe[0]);
 
-        execlp(driver, driver, (char *) 0);
+        execlp(driver, driver, (char *) NULL);
         err_sys("execlp error for: %s", driver);
     }
 
