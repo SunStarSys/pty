@@ -350,7 +350,8 @@ sub drive (&) {
                         $disabled = !$disabled;
                         $state = $disabled ? " off" : " on";
                     }
-                    write_master `clear` . "$script_name toggled$state.\r\n";
+                    s/(toggle $script_name)( on| off)?/$script_name toggled$state./;
+                    write_master;
                 }
                 elsif ($disabled) {
                     # prevent any further driver processing
