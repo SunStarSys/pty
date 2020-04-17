@@ -3,7 +3,7 @@ include Make.def.44
 VERSION = 1.1.0-dev
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
-MANIFEST= *.c *.h ${SCRIPTS} Make* README
+MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
 
 
 all:	${PROG}
