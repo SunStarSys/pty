@@ -32,15 +32,15 @@ drive {
         # out by toggling the driver off temporarily first.
         write_slave "r\n";
     }
-    elsif (/^$PREFIX_RE\QPassword:/m) {
+    elsif (/^$PREFIX_RE\QPassword:$NSM /m) {
         # stop here unless echo is off to protect against driver replies
         # on otherwise matching reads or similar. Note: running a bash
         # login shell on a remote host over ssh will always disable
         # echo on the SLAVE terminal, so be careful that you actually
         # trust the foreign host's executables unless you use
         # zsh, which behaves appropriately.
-        return 1 if echo_enabled SLAVE_TTY_FD;
-        write_slave getpw("SYSTEM") . "\n"; # send SYSTEM pw to SLAVE terminal
+        write_slave getpw("SYSTEM") . "\n" # send SYSTEM pw to SLAVE terminal
+            unless echo_enabled SLAVE_TTY_FD;
 
         # NOTE: if you do $(ssh -t ...  -- sudo ...)
         # you may get two AD prompts in succession, without interceding
@@ -53,9 +53,9 @@ drive {
         # between (successful) successive prompts by two different apps
         # that seek AD creds.
     }
-    elsif (/^$PREFIX_RE\QEnter passphrase for /) {
-        return 1 if echo_enabled SLAVE_TTY_FD;
-        write_slave getpw("SSH") . "\n"; # send SSH pw to SLAVE terminal
+    elsif (/^$PREFIX_RE\QEnter passphrase for$NSM /) {
+        write_slave getpw("SSH") . "\n" # send SSH pw to SLAVE terminal
+            unless echo_enabled SLAVE_TTY_FD;
     }
     #
     # to extend the functionality of this script, add new elsif blocks
