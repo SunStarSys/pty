@@ -73,6 +73,9 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+## Changes with v1.1.1:
+
+
 ## Changes with v1.1.0:
 
 - pty-pw-driver.pl split into pty_driver.pm and pty-driver.pl
