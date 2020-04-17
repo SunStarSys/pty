@@ -65,10 +65,10 @@ drive {
     # in your getpw($type) call so it will be tracked properly
     # by pty-agent.
     #
-    elsif (/^$PREFIX_RE\QSorry, try again./m) {
+    elsif (/^$PREFIX_RE\QSorry,$NSM try again./m) {
         # skip interceding sudo authentication error message
     }
-    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!m) {
+    elsif (m!^$PREFIX_RE\QDo you want$NSM to continue? [Y/n]!m) {
         # accept the default for this apt-get prompt
         write_slave "\n";
     }
