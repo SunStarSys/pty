@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# pty driver customized for SYSTEM "Password:" and SSH prompt
+# pty driver customized for SYSTEM "Password:" and SSH passphrase prompt
 # SPDX License Identifier: Apache License 2.0
 
 use strict;
@@ -9,7 +9,8 @@ use warnings FATAL => 'all';
 use lib "$ENV{HOME}/bin";
 use pty_driver;
 
-# keep 'use strict' happy (these are the two global vars from pty_driver.pm):
+# keep 'use strict' happy (these are the two global vars we need
+# from pty_driver.pm):
 
 our $PREFIX_RE;
 our $NSM;
@@ -17,7 +18,7 @@ our $NSM;
 drive {
     # this is the actual running program where user-customizable
     # code changes (to test $_) go.  Returns true if we handled
-    # the line, false otherwise.
+    # the contents of $_, false otherwise.
 
     if (m!\(yes/${NSM}no\)\?!g or /'yes' or ${NSM}'no'/) {
         # we always err on the side of caution,

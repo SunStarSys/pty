@@ -19,21 +19,17 @@ SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
 USE THIS WITH SHELLS/SCREEN!
 
 STDIN and STDOUT are a socketpaired Unix Socket by a pty child process.
-STDIN is read from the SLAVE terminal by that pty child and sent to us.
-This represents the combined terminal output of the driven process.
+STDIN comes from the SLAVE terminal attached to pty's driven process and sent
+to us. STDOUT is written back to the SLAVE terminal which is delivered to that
+driven process's STDIN.  This represents the combined terminal interfaces of the
+driven process. STDERR is attached to the MASTER terminal, since pty dup2's the
+controlling pty process's STDIN to STDERR.
 
-STDOUT is written to the SLAVE terminal by that pty child.  This represents
-terminal input for the driven process, typically through its own STDIN.
+Here's an example cron job that will run a shell script:
 
-STDERR is attached to the MASTER terminal, since pty dup2's the controlling
-pty process's STDIN to this process's STDERR.  Here's an example scripted
-cron job that will run a shell session script:
+0 23 * * * pty -d pty-driver.pl -- $script_with_prompts_eg_ansible_vaults
 
-0 23 * * * pty -d pty-driver.pl <session_script.sh -- bash
-
-Be sure session_script.sh ends with an exit call to terminate the bash shell.
-
-fd 3 is attached directly to the SLAVE terminal, which we inherited
+Note: fd 3 is attached directly to the SLAVE terminal, which we inherited
 from the parent pty process during our fork+exec. We take advantage of
 fd 3 only when we check its ECHO status before driving any password prompts.
 
@@ -45,17 +41,18 @@ fd 3 only when we check its ECHO status before driving any password prompts.
 
 =pod
 
-use constant MASTER_TTY_FD    => fileno STDERR;
+use constant MASTER_TTY_FD        => fileno STDERR;
 
-use constant SLAVE_TTY_FD     => 3;
+use constant SLAVE_TTY_FD         => 3;
 
-use constant BUFSIZE          => 4096;
+use constant BUFSIZE              => 4096;
 
-use constant SOCKET_IO_TIMEOUT => 3;
+use constant SOCKET_IO_TIMEOUT    => 3;
 
 use constant TTY_READKEY_TIMEOUT => 0.01;
 
-use constant PTY_AGENT_SOCKET => "$ENV{HOME}/.pty-agent/socket";
+use constant PTY_AGENT_SOCKET    => "$ENV{HOME}/.pty-agent/socket";
+
 
 =head2 INITIALIZATION
 
@@ -95,7 +92,6 @@ END { defined $mterm and ReadMode restore => $mterm; }
 
 
 =head2 HELPER FUNCTIONS
-
 
 =item write_master (;$)
 
@@ -154,7 +150,7 @@ ReadKey in a (portable non-blocking) loop on the passed filehandle, to $_.  Retu
 =cut
 
 sub read_input_nb ($) {
-    my $r = shift;
+    my $r = shift; # either a socket or a terminal - either way ReadKey will work
     $_ = "";
     while (defined(my $key = ReadKey TTY_READKEY_TIMEOUT, $r)) {
         $_ .= $key;
@@ -360,7 +356,7 @@ sub drive (&) {
     }
 }
 
-# check if called from do FILE or require FILE in another script.
+# check if called from do FILE or require FILE or use MODULE in another script.
 # if so stop here and leave invocation of drive {} to caller, since
 # we're just being included in perl4-ish library mode.
 
