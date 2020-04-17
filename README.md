@@ -22,32 +22,42 @@ See the pty_driver.pm script for commentary on how pty works for coprocessing
       -V       Version
 ```
 
-`pty -d $driver` is a cross-language portable `TCL expect`-like interface
-for wiring a coprocess's stdin/stdout directly to a pseudoterminal.  Because
-stderr is unaltered by the `$driver`, it is connected to the master terminal
-controlling the `pty` process. We can hence use the driver as a **copilot** for
-terminal sessions.
+`pty -d $driver $app` is a cross-language portable `TCL expect`-like interface
+for wiring a coprocess's stdin/stdout directly to a pseudoterminal connected to
+`$app`.  Because stderr is unaltered by the `$driver`, it is connected to the
+master terminal controlling the `pty` process. We can hence use the driver as
+a **copilot** for terminal sessions interacting with `$app = $SHELL, screen,
+tmux, etc.`.
 
 ## Automated population of "common" credentials
 
 If you are dealing with orchestration engines like `ansible` that manage a
 secure encrypted-at-rest Vault, and need to supply the password in a simple,
 automated fashion without writing it to disk, you can use `pty` to work through
-the password delivery to a contolling terminal.  Have a peek at `bin/pty*` to
+the password delivery to a contolling terminal.  Have a peek at `pty-driver.pl` to
 see how I accomplish this for system login prompts, as well as password-
 protected ssh private keys.
 
-`C`-wise, it's just a little hacking beyond what you see in Richard Steven's
+`C`-wise, it's just a little hacking beyond what you see in W. Richard Stevens'
 _Advanced Programming in the Unix Environment_. `Perl5`-wise, there's a lot
 of stuff going on, but the only module dependency is Term::ReadKey.
 `Python3-wise` it just depends on the setproctitle module.
 
+## LICENSE
+
+1. The licensing on the scripts is the AL2.0.
+
+2. The licensing on the `C` sources comes from Addison-Wesley's statements on
+code reuse of [APUE](http://www.kohala.com/start/), since this is a derivative
+work of Stevens' (now deceased) online-published source code.
+
 ## INSTRUCTIONS:
 
 To build the app, edit the Makefile with the right Make.def.* include for
-your OS. Make.def.44 is a popular choice but doesn't work on all platforms.
-It may require some customization to get your build working, but I've tested
-on linux and OSX. Should also work without modification on FreeBSD.
+your OS. Make.def.44 (`gcc` builds) is a popular choice, but doesn't work
+on all platforms.  It may require some customization to get your build
+working, but I've tested on linux and OSX. Should also work without
+modification on FreeBSD.
 
 Then build pty with
 ```
