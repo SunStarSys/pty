@@ -39,7 +39,7 @@ drive {
         # echo on the SLAVE terminal, so be careful that you actually
         # trust the foreign host's executables unless you use
         # zsh, which behaves appropriately.
-        next if echo_enabled SLAVE_TTY_FD;
+        return 1 if echo_enabled SLAVE_TTY_FD;
         write_slave getpw("SYSTEM") . "\n"; # send SYSTEM pw to SLAVE terminal
 
         # NOTE: if you do $(ssh -t ...  -- sudo ...)
@@ -54,7 +54,7 @@ drive {
         # that seek AD creds.
     }
     elsif (/^$PREFIX_RE\QEnter passphrase for /) {
-        next if echo_enabled SLAVE_TTY_FD;
+        return 1 if echo_enabled SLAVE_TTY_FD;
         write_slave getpw("SSH") . "\n"; # send SSH pw to SLAVE terminal
     }
     #

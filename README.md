@@ -75,6 +75,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 ## Changes with v1.1.1:
 
+- cosmetic returns for easier readability in pty-driver.pl
+
 
 ## Changes with v1.1.0:
 
