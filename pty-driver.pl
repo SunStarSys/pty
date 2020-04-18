@@ -20,7 +20,7 @@ drive {
     # code changes (to test $_) go.  Returns true if we handled
     # the contents of $_, false otherwise.
 
-    if (m!\(yes/${NSM}no\)\?!g or /'yes' or ${NSM}'no'/) {
+    if (m!\(yes/${NSM}no\)\?!g or /'yes' or ${NSM}'no'/m) {
         # we always err on the side of caution,
         # but this can be customized differently.
         write_slave "no\n";
@@ -33,7 +33,7 @@ drive {
         # out by toggling the driver off temporarily first.
         write_slave "r\n";
     }
-    elsif (/^$PREFIX_RE\QPassword$NSM:/) {
+    elsif (/^$PREFIX_RE\QPassword$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
         # on otherwise matching reads or similar. Note: running a bash
         # login shell on a remote host over ssh will always disable
@@ -42,7 +42,7 @@ drive {
         # zsh, which behaves appropriately.
         echo_enabled or write_slave getpw("SYSTEM") . "\n";
     }
-    elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /) {
+    elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
         echo_enabled or write_slave getpw("SSH") . "\n";
     }
     #

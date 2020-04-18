@@ -311,7 +311,7 @@ sub getpw ($;$) {
 
 =pod
 
-our $PREFIX_RE = qr/[\s\S]*/; # everything
+our $PREFIX_RE = qr/.*/; # everything on the current line
 
 our $NSM       = ''; # include this in regexps so as to not match themselves,
                      # e.g., for 'pty -d $0 -- $SHELL -c "cat $0"'
@@ -356,10 +356,10 @@ sub drive (&) {
                     # works well for screen window switching, but still
                     # haven't figured out the right incantation for tmux.
                 }
-                elsif (/^$PREFIX_RE$script_name( on| off)\s/) {
-                    my $state = $1;
+                elsif (/^($PREFIX_RE)$script_name( on| off)\s/m) {
+                    my $state = $2;
                     $disabled = $state eq " off" ? 1 : 0;
-                    s/^($PREFIX_RE)$script_name$state/$1$script_name turned$state./;
+                    s//$1$script_name turned$state./m;
                     write_master;
                 }
                 elsif ($disabled) {
@@ -409,7 +409,7 @@ drive {
         # but this can be customized differently.
         write_slave "no\n";
     }
-    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!) {
+    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!m) {
         # accept the default for this apt-get prompt
         write_slave "\n";
     }
