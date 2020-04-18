@@ -65,9 +65,9 @@ system q(lsof ) . PTY_AGENT_SOCKET . q( >/dev/null 2>&1 || exec pty-agent);
 
 =pod
 
-Initialize rw connection to master terminal, if available.  If it's not
-available then any calls to prompt() induced during the driving process will
-cause the entire show to end.
+Initialize rw connection to master/slave terminals.  If $mterm is
+not a tty, then any calls to prompt() induced during the driving
+process will cause the entire show to end.
 
 =cut
 

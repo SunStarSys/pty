@@ -80,6 +80,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - code comments review
 
+- better flexibility for non-tty on master pty's STDIN (eg cron usage)
+
 
 ## Changes with v1.1.2:
 
