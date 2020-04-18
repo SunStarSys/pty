@@ -185,7 +185,7 @@ ReadKey in a (portable non-blocking) loop on the passed filehandle, to $_.  Retu
 
 sub read_input_nb ($) {
     my $r = shift; # either a socket or a terminal - either way ReadKey will work
-    sysread $r, $_, BUFSIZE or die "sysread failed: $!";
+    sysread $r, $_, BUFSIZE or return;
     while (defined(my $key = ReadKey TTY_READKEY_TIMEOUT, $r)) {
         $_ .= $key;
     }
