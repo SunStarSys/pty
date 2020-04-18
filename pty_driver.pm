@@ -357,7 +357,7 @@ sub drive (&) {
                 elsif (/^$PREFIX_RE$script_name( on| off)\s/) {
                     my $state = $1;
                     $disabled = $state eq " off" ? 1 : 0;
-                    s/($PREFIX_RE)$script_name$state/$1$script_name turned$state./;
+                    s/^($PREFIX_RE)$script_name$state/$1$script_name turned$state./;
                     write_master;
                 }
                 elsif ($disabled) {
