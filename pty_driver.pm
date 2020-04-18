@@ -74,7 +74,8 @@ cause the entire show to end.
 my ($mterm, $sterm);
 
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
-     [\$sterm, SLAVE_TTY_FD,  sub {}]) {
+     [\$sterm, SLAVE_TTY_FD,  sub {}])
+{
     open ${$$_[0]}, "+<&=" . $$_[1]
         or die "Can't open $$_[1]: $!";
     isatty ${$$_[0]} or die "$$_[1] not a tty!";
