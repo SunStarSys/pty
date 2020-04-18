@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # generic pty driver
 # SPDX License Identifier: Apache License 2.0
