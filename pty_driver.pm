@@ -71,6 +71,7 @@ cause the entire show to end.
 =cut
 
 
+my $script_name = basename $0, ".pl";
 my ($mterm, $sterm);
 
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
@@ -205,7 +206,7 @@ sub prompt ($) {
     local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
 
     ReadMode noecho => $mterm;
-    write_master "\n$type Password (^D aborts): "; # aborting will terminate pty
+    write_master "\n$type Password (for $script_name, ^D aborts): "; # aborting will terminate pty
     no warnings 'uninitialized';
     chomp(my $passwd = ReadLine 0, $mterm);
     defined $passwd or die "Operation aborted";
@@ -333,7 +334,6 @@ sub drive (&) {
     # toggle to deactivate automatic responses from this script when true
     my $disabled         = 0;
     # adjusts toggle input line, matching unsuffixed $0
-    my $script_name      = basename $0, ".pl";
     my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
     my $clear = `clear`;
 
