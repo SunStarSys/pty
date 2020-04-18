@@ -47,9 +47,9 @@ use constant BUFSIZE              => 4096;
 
 use constant SOCKET_IO_TIMEOUT    => 3;
 
-use constant TTY_READKEY_TIMEOUT => 0.01;
+use constant TTY_READKEY_TIMEOUT  => 0.01;
 
-use constant PTY_AGENT_SOCKET    => "$ENV{HOME}/.pty-agent/socket";
+use constant PTY_AGENT_SOCKET     => "$ENV{HOME}/.pty-agent/socket";
 
 
 =head2 INITIALIZATION
