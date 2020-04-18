@@ -111,7 +111,9 @@ sub echo_enabled () {
     return ECHO == (ECHO & $stermios->getlflag);
 }
 
-sub disable_slave_echo () {
+# these two subs are here just-in-case they prove useful (not yet so)
+
+sub disable_echo () {
     $stermios->getattr(SLAVE_TTY_FD);
     $stermios->setlflag($stermios->getlflag & ~(ECHO | ECHOE | ECHONL | ECHOK));
     defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
@@ -120,7 +122,7 @@ sub disable_slave_echo () {
 
 }
 
-sub enable_slave_echo () {
+sub enable_echo () {
     $stermios->getattr(SLAVE_TTY_FD);
     $stermios->setlflag($stermios->getlflag | (ECHO | ECHOE | ECHONL | ECHOK));
     defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
