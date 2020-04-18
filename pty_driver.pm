@@ -17,12 +17,13 @@ use File::Basename 'basename';
 SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
 USE THIS WITH SHELLS/SCREEN!
 
-STDIN and STDOUT are a socketpaired Unix Socket by a pty child process.
+STDIN and STDOUT are dup2'd to a socketpaired Unix Socket by a pty child process.
 STDIN comes from the SLAVE terminal attached to pty's driven process and sent
 to us. STDOUT is written back to the SLAVE terminal which is delivered to that
 driven process's STDIN.  This represents the combined terminal interfaces of the
-driven process. STDERR is attached to the MASTER terminal, since pty dup2's the
-controlling pty process's STDIN to STDERR.
+driven process. STDERR is attached to the MASTER terminal (the one we can interface
+with directly via hardware devices), since pty dup2's the controlling pty process's
+STDIN to STDERR.
 
 Here's an example cron job that will run a shell script:
 
@@ -39,7 +40,7 @@ from the parent pty process during our fork+exec.
 
 =pod
 
-use constant MASTER_TTY_FD        => fileno STDERR;
+use constant MASTER_TTY_FD        => fileno STDERR; # 2
 
 use constant SLAVE_TTY_FD         => 3;
 
