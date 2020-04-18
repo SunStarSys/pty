@@ -18,11 +18,11 @@ install:all
 
 	@[ -d ~/.pty-agent ] \
 	|| (mkdir ~/.pty-agent && chmod 0700 ~/.pty-agent && echo "Created secure ~/.pty-agent dir.") \
-	|| (echo "Can't create secure ~/.pty-agent dir: $!" >&2 && false)
+	|| (echo "Can't create secure ~/.pty-agent dir: $$!" >&2 && false)
 
 	@[ -d ~/bin ] \
 	|| (mkdir ~/bin && echo "Created ~/bin dir.") \
-	|| (echo "Can't create ~/bin dir: $!" >&2 && false)
+	|| (echo "Can't create ~/bin dir: $$!" >&2 && false)
 
 	@perl -MIO::Select -MTerm::ReadKey -e 1 \
 	|| (echo "Installing IO::Select and Term::ReadKey to system perl tree from CPAN via sudo." \
