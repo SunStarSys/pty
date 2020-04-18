@@ -20,12 +20,12 @@ drive {
     # code changes (to test $_) go.  Returns true if we handled
     # the contents of $_, false otherwise.
 
-    if (m!\(yes/${NSM}no\)\?!g or /'yes' or ${NSM}'no'/m) {
+    if (m!\(yes/${NSM}no\)\?! or /'yes' or ${NSM}'no'/) {
         # we always err on the side of caution,
         # but this can be customized differently.
         write_slave "no\n";
     }
-    elsif (/^$PREFIX_RE\Q(R)eject, accept (t)emporarily ${NSM}or accept (p)ermanently?/) {
+    elsif (/^$PREFIX_RE\Q(R)eject, accept (t)emporarily ${NSM}or accept (p)ermanently?/m) {
         # this is a typical ssh unkown-host-key prompt.
         # we do not want to be interrupted for automation,
         # but we also don't want to be connecting without manual
