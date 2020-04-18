@@ -55,7 +55,7 @@ use constant PTY_AGENT_SOCKET    => "$ENV{HOME}/.pty-agent/socket";
 =head2 INITIALIZATION
 
 Intitialize pty-agent if necessary. pty-agent sticks around until reboot, and
-is usually the only thing that turns up on a $(pgrep -u $USER python) cmd.
+is usually the only thing that turns up on a $(pgrep -u $USER pty-agent) cmd.
 if that's hard to ferret out just use lsof on the socket as below.
 
 =cut
