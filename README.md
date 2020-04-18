@@ -40,8 +40,8 @@ protected ssh private keys.
 
 `C`-wise, it's just a little hacking beyond what you see in W. Richard Stevens'
 _Advanced Programming in the Unix Environment_. `Perl5`-wise, there's a lot
-of stuff going on, but the only module dependency is Term::ReadKey.
-`Python3-wise` it just depends on the setproctitle module.
+of stuff going on, but the only module dependencies are `IO::Select` and `Term::ReadKey`.
+`Python3-wise` it just depends on the `setproctitle` module.
 
 ## LICENSE
 
@@ -72,6 +72,15 @@ Do not `make install` as root, it will prevent you from doing so.
 
 
 # RELEASE NOTES:
+
+## Changes with v1.1.2:
+
+- cleaned up a few regressions in v1.1.1 related to screen clears.
+
+- echo_enabled no longer takes an argument, and it's only useful when working
+  directly with a shell (multiplexers provide their own pty's that we can't
+  interface with directly).
+
 
 ## Changes with v1.1.1:
 

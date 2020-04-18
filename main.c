@@ -117,7 +117,7 @@ main(int argc, char *argv[])
         d_pid = do_driver(driver); /* changes our stdin/stdout */
 
     loop(fdm, ignoreeof, delay); /* copies stdin -> ptym, ptym -> stdout */
-        
+
     if (close(fdm) != 0)
         err_sys("close failed");
 

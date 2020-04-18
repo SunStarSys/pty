@@ -12,7 +12,6 @@ use IO::Select;
 use IO::Socket::UNIX;
 use File::Basename 'basename';
 
-
 =head2 INTRODUCTION
 
 SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
@@ -72,26 +71,61 @@ cause the entire show to end.
 
 =cut
 
+
 my ($mterm, $sterm);
 
-for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => shift}], [\$sterm, SLAVE_TTY_FD]) {
+for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
+     [\$sterm, SLAVE_TTY_FD,  sub {}]) {
     open ${$$_[0]}, "+<&=" . $$_[1]
-        or die "Can't open $$_[1]: $!\n";
-    isatty ${$$_[0]} or die "Not a tty!";
-    $$_[2]->(${$$_[0]}) if @$_ > 2;
+        or die "Can't open $$_[1]: $!\r\n";
+    isatty ${$$_[0]} or die "Not a tty!\r\n";
+    $$_[2]->();
 }
 
+sub write_master (;$);
+
 # Die cleanly if called for
-$SIG{__DIE__} = sub {kill INT => getppid; exit 1 };
+$SIG{__DIE__} = sub { write_master shift; sleep 1; kill INT => getppid; exit 1 };
 
 # pty's typical cleanup signal
 $SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; exit 255 };
 
 # reset MASTER terminal (invoked on die() and normal exit(), not on signals)
-END { defined $mterm and ReadMode restore => $mterm; }
+END { defined $mterm and ReadMode restore => $mterm; sleep 1; }
 
 
 =head2 HELPER FUNCTIONS
+
+=item echo_enabled ($)
+
+Takes an fd as argument, typically MASTER_PTY_FD or SLAVE_PTY_FD.
+Returns true if the terminal attached to that fd has echo enabled.
+
+=cut
+
+my $stermios = POSIX::Termios->new;
+
+sub echo_enabled () {
+    $stermios->getattr(SLAVE_TTY_FD);
+    return ECHO == (ECHO & $stermios->getlflag);
+}
+
+sub disable_slave_echo () {
+    $stermios->getattr(SLAVE_TTY_FD);
+    $stermios->setlflag($stermios->getlflag & ~(ECHO | ECHOE | ECHONL | ECHOK));
+    defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
+    select undef, undef, undef, TTY_READKEY_TIMEOUT;
+    die "Can't disable echo on slave: $!" if echo_enabled;
+
+}
+
+sub enable_slave_echo () {
+    $stermios->getattr(SLAVE_TTY_FD);
+    $stermios->setlflag($stermios->getlflag | (ECHO | ECHOE | ECHONL | ECHOK));
+    defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
+    select undef, undef, undef, TTY_READKEY_TIMEOUT;
+    die "Can't enable echo on slave: $!" unless echo_enabled;
+}
 
 =item write_master (;$)
 
@@ -133,7 +167,7 @@ sub write_slave (;$) {
     eval {
         alarm SOCKET_IO_TIMEOUT;
         do {
-            my $w = syswrite STDOUT, $_, $blen - $wrote, $wrote;
+            my $w = syswrite $sterm, $_, $blen - $wrote, $wrote;
             die "syswrite failed: $!" unless $w >= 0;
             $wrote += $w;
         } while $wrote < $blen;
@@ -166,17 +200,16 @@ Prompt master terminal for a password of a given argument $type and return it.
 =cut
 
 sub prompt ($) {
-    defined $mterm or die "Terminal not present for prompt()!\n";
     my $type = shift;
-    # block these to avoid leaving tty in a non-echo state
+    # block these to avoid leaving $mterm in a non-echo state
     local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
 
-    write_master "\r\n$type Password (^D aborts): "; #aborting will terminate pty
     ReadMode noecho => $mterm;
+    write_master "\n$type Password (^D aborts): "; # aborting will terminate pty
     no warnings 'uninitialized';
     chomp(my $passwd = ReadLine 0, $mterm);
+    defined $passwd or die "Operation aborted";
     ReadMode "ultra-raw" => $mterm;
-    defined $passwd or die "Operation aborted\n";
     return $passwd;
 }
 
@@ -224,7 +257,7 @@ $(pty-agent) over its secure Unix domain socket, and returns it.
 sub getpw ($;$) {
     my ($type, $prompt) = @_;
     index($type, ' ') >= 0
-        and die "getpw(): invalid type '$type' contains a space char!\n";
+        and die "getpw(): invalid type '$type' contains a space char!";
 
     if (-S PTY_AGENT_SOCKET) {
 
@@ -262,19 +295,6 @@ sub getpw ($;$) {
     }
 }
 
-=item echo_enabled ($)
-
-Takes an fd as argument, typically MASTER_PTY_FD or SLAVE_PTY_FD.
-Returns true the terminal attached to that fd has echo enabled.
-
-=cut
-
-sub echo_enabled ($) {
-    my $termios = POSIX::Termios->new;
-    $termios->getattr(shift);
-    return +(ECHO & $termios->getlflag) == ECHO;
-}
-
 
 # main:: globals for internal/external drive {} code blocks.
 
@@ -309,28 +329,38 @@ as argument, which should return true if the code block "handled" $_.
 
 sub drive (&) {
     my $custom_handler   = shift;
-    my $s                = IO::Select->new(\*STDIN, $mterm);
 
     # toggle to deactivate automatic responses from this script when true
     my $disabled         = 0;
     # adjusts toggle input line, matching unsuffixed $0
     my $script_name      = basename $0, ".pl";
+    my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
+    my $clear = `clear`;
+
+    # close over $sterm so perl doesn't nuke SLAVE_TTY_FD descriptor post-module-import
+    die "WTF???\n" unless fileno($sterm) == SLAVE_TTY_FD;
 
     local $_;
 
     while (my @readable = $s->can_read) {
+
         for my $r (@readable) {
             # a normal exit here can happen when the driven process shuts down.
             read_input_nb $r or exit;
 
-            if ($r == \*STDIN) {
-                write_master; # writes SLAVE output in $_ to MASTER terminal
-                              # so we can see it.
+            if ($r != $mterm) {
+                # write SLAVE output in $_ to MASTER so we can see it.
+                write_master;
 
-                if (/^$PREFIX_RE$script_name( on| off)\s/ and substr($_, -4) eq "[27m") {
+                if (index($_, $clear) >= 0) {
+                    # don't process window clears (during a redraw).
+                    # works well for screen window switching, but still
+                    # haven't figured out the right incantation for tmux.
+                }
+                elsif (/^$PREFIX_RE$script_name( on| off)\s/) {
                     my $state = $1;
                     $disabled = $state eq " off" ? 1 : 0;
-                    s/($PREFIX_RE)$script_name$state\s/$1$script_name turned$state./;
+                    s/($PREFIX_RE)$script_name$state/$1$script_name turned$state./;
                     write_master;
                 }
                 elsif ($disabled) {
