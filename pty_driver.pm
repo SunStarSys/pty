@@ -407,7 +407,7 @@ drive {
         # but this can be customized differently.
         write_slave "no\n";
     }
-    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!m) {
+    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!) {
         # accept the default for this apt-get prompt
         write_slave "\n";
     }
