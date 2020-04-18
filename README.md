@@ -40,7 +40,7 @@ protected ssh private keys.
 
 
 The trick with cron+ansible is to avoid the need for pty-driver.pl to call
-prompt(), by ensuring all of the required credentials are alll there in the
+prompt(), by ensuring all of the required credentials are present in the
 already-running `pty-agent` daemon.  If needed, pipe `sleep 30` to the `pty`
 process on your cron'd ansible script to ensure ansible doesn't reject cron's
 closed STDIN.
