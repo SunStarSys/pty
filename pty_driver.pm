@@ -80,7 +80,7 @@ for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
 {
     open ${$$_[0]}, "+<&=" . $$_[1]
         or die "Can't open $$_[1]: $!";
-    isatty ${$$_[0]} or die "$$_[1] not a tty!";
+    isatty ${$$_[0]} or warn "$$_[1] not a tty!";
     $$_[2]->();
 }
 
