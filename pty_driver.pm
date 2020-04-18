@@ -77,8 +77,8 @@ my ($mterm, $sterm);
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
      [\$sterm, SLAVE_TTY_FD,  sub {}]) {
     open ${$$_[0]}, "+<&=" . $$_[1]
-        or die "Can't open $$_[1]: $!\r\n";
-    isatty ${$$_[0]} or die "Not a tty!\r\n";
+        or die "Can't open $$_[1]: $!";
+    isatty ${$$_[0]} or die "Not a tty!";
     $$_[2]->();
 }
 
@@ -336,9 +336,6 @@ sub drive (&) {
     my $script_name      = basename $0, ".pl";
     my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
     my $clear = `clear`;
-
-    # close over $sterm so perl doesn't nuke SLAVE_TTY_FD descriptor post-module-import
-    die "WTF???\n" unless fileno($sterm) == SLAVE_TTY_FD;
 
     local $_;
 
