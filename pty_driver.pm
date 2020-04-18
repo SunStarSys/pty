@@ -29,8 +29,7 @@ Here's an example cron job that will run a shell script:
 0 23 * * * pty -d pty-driver.pl -- $script_with_prompts_eg_ansible_vaults
 
 Note: fd 3 is attached directly to the SLAVE terminal, which we inherited
-from the parent pty process during our fork+exec. We take advantage of
-fd 3 only when we check its ECHO status before driving any password prompts.
+from the parent pty process during our fork+exec.
 
 =head2 CONSTANTS
 
