@@ -97,10 +97,9 @@ END { defined $mterm and ReadMode restore => $mterm; sleep 1; }
 
 =head2 HELPER FUNCTIONS
 
-=item echo_enabled ($)
+=item echo_enabled
 
-Takes an fd as argument, typically MASTER_PTY_FD or SLAVE_PTY_FD.
-Returns true if the terminal attached to that fd has echo enabled.
+Returns true if the slave terminal has echo enabled.
 
 =cut
 
