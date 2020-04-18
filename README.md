@@ -38,6 +38,13 @@ the password delivery to a contolling terminal.  Have a peek at `pty-driver.pl` 
 see how I accomplish this for system login prompts, as well as password-
 protected ssh private keys.
 
+
+The trick with cron+ansible is to avoid the need for pty-driver.pl to call
+prompt(), by ensuring all of the required credentials are alll there in the
+already-running `pty-agent` daemon.  If needed, pipe `sleep 30` to the `pty`
+process on your cron'd ansible script to ensure ansible doesn't reject cron's
+closed STDIN.
+
 `C`-wise, it's just a little hacking beyond what you see in W. Richard Stevens'
 _Advanced Programming in the Unix Environment_. `Perl5`-wise, there's a lot
 of stuff going on, but the only module dependencies are `IO::Select` and `Term::ReadKey`.
