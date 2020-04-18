@@ -73,6 +73,14 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+
+## Changes with v1.1.3:
+
+- reintroduced sysread for better performance.
+
+- code comments review
+
+
 ## Changes with v1.1.2:
 
 - cleaned up a few regressions in v1.1.1 related to screen clears.
