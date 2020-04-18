@@ -206,7 +206,7 @@ sub prompt ($) {
     local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
 
     ReadMode noecho => $mterm;
-    write_master "\n$type Password (for $script_name, ^D aborts): "; # aborting will terminate pty
+    write_master "\n$type Password (^D aborts $script_name): "; # aborting will terminate pty
     no warnings 'uninitialized';
     chomp(my $passwd = ReadLine 0, $mterm);
     defined $passwd or die "Operation aborted";
