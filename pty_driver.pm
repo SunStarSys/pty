@@ -331,10 +331,10 @@ as argument, which should return true if the code block "handled" $_.
 =cut
 
 sub drive (&) {
-    my $custom_handler   = shift;
+    my $custom_handler = shift;
 
     # toggle to deactivate automatic responses from this script when true
-    my $disabled         = 0;
+    my $disabled = 0;
     # adjusts toggle input line, matching unsuffixed $0
     my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
     my $clear = `clear`;
