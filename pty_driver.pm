@@ -67,12 +67,16 @@ system q(lsof ) . PTY_AGENT_SOCKET . q( >/dev/null 2>&1 || exec pty-agent);
 
 Initialize rw connection to master/slave terminals.  If $mterm is
 not a tty, then any calls to prompt() induced during the driving
-process will cause the entire show to end.
+process will cause the entire show to end.  So be sure all the required
+passwords are available in the running `pty-agent` before using this
+script w/o a controlling master terminal (eg cron apps).
 
 =cut
 
-
+# adjusts toggle input line, matching unsuffixed $0
 my $script_name = basename $0, ".pl";
+
+# master/slave terminals
 my ($mterm, $sterm);
 
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
@@ -182,7 +186,8 @@ sub write_slave (;$) {
 
 =item read_input_nb ($)
 
-ReadKey in a (portable non-blocking) loop on the passed filehandle, to $_.  Returns length of $_.
+ReadKey in a (portable non-blocking) loop on the passed filehandle, to $_.
+Returns length of $_.
 
 =cut
 
@@ -233,7 +238,7 @@ sub IO::Socket::UNIX::timed_call {
 }
 
 my %saw_pw;   # status flags by type to differentiate login success or
-              # failure requiring a new prompt() by getpw()
+              # a failure that requires a new prompt() by getpw()
 my  %secret;  # non-agent mode of getpw() operation, shouldn't happen in reality.
 
 =item sawpw ()
@@ -335,7 +340,6 @@ sub drive (&) {
 
     # toggle to deactivate automatic responses from this script when true
     my $disabled = 0;
-    # adjusts toggle input line, matching unsuffixed $0
     my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
     my $clear = `clear`;
 
