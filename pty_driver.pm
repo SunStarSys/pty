@@ -27,7 +27,7 @@ STDIN to STDERR.
 
 Here's an example cron job that will run a shell script:
 
-0 23 * * * pty -d pty-driver.pl -- $script_with_prompts_eg_ansible_vaults
+0 23 * * * pty -d pty-driver.pl -- $script_with_eg_ansible_vaults
 
 Note: fd 3 is attached directly to the SLAVE terminal, which we inherited
 from the parent pty process during our fork+exec.
