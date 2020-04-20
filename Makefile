@@ -1,4 +1,4 @@
-include Make.def.44
+include Make.def.clang
 
 VERSION = 1.1.4-dev
 PROG = pty

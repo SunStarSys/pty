@@ -1,0 +1,19 @@
+# Common make definitions for GNU make under 386BSD.
+
+# Definitions required in all program directories to compile and link
+# C programs using gcc.  We also have to get rid of Sun's "-target" options,
+# as gcc doesn't grok it.
+
+CC=clang
+COMPILE.c=$(CC) $(CFLAGSOG) $(CPPFLAGS) -c
+LINK.c=$(CC) $(CFLAGSO) $(CPPFLAGS) $(LDFLAGS)
+LDLIBS=-lutil
+
+# Common definitions
+
+CFLAGS	= -Wall -Werror
+CFLAGSO	= -Wall -Werror -O2
+CFLAGSOG = -Wall -Werror -O2 -g
+
+TEMPFILES = core core.* *.o temp.* *.out typescript* ${PROG} ${PROG}-*.tar.gz
+# Common temp files to delete from each directory.
