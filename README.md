@@ -81,6 +81,11 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
+## Changes with v1.1.4:
+
+- default to clang debug compiles.
+
+
 ## Changes with v1.1.3:
 
 - reintroduced sysread for better performance.
