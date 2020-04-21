@@ -38,7 +38,6 @@ the password delivery to a contolling terminal.  Have a peek at `pty-driver.pl` 
 see how I accomplish this for system login prompts, as well as password-
 protected ssh private keys.
 
-
 The trick with cron+ansible is to avoid the need for pty-driver.pl to call
 prompt(), by ensuring all of the required credentials are present in the
 already-running `pty-agent` daemon.  If needed, pipe `sleep 30` to the `pty`
@@ -52,10 +51,10 @@ of stuff going on, but the only module dependencies are `IO::Select` and `Term::
 
 ## LICENSE
 
-1. The licensing on the scripts is the AL2.0.
+1. The licensing on the scripts is the AL-2.0.
 
-2. The licensing on the `C` sources comes from Addison-Wesley's statements on
-code reuse of [APUE](http://www.kohala.com/start/), since this is a derivative
+2. The licensing on the `C` sources comes from Addison-Wesley's disclaimers on
+code (re)use of [APUE](http://www.kohala.com/start/), since this is a derivative
 work of Stevens' (now deceased) online-published source code.
 
 ## INSTRUCTIONS:
@@ -66,16 +65,27 @@ on all platforms.  It may require some customization to get your build
 working, but I've tested on linux and OSX. Should also work without
 modification on FreeBSD.
 
+Currently the Makefile defaults to Make.def.clang, which is a debuggable build
+(typically with LLDB as the debugger, which has integration with emacs dap pkg).
+
 Then build pty with
 ```
     % make
 ```
-and if you get a working pty executable, run
+and if you get a working `pty` executable, run
 ```
     % make install
 ```
 to install the pty executable and associated scripts to your ~/bin dir.
 Do not `make install` as root, it will prevent you from doing so.
+
+### Common Use Cases Involving Driver:
+
+```
+    % pty -d pty-driver.pl $SHELL
+    % pty -d pty-driver.pl screen
+    % pty -d pty-driver.pl -- ansible-playbook ...
+```
 
 
 # RELEASE NOTES:
