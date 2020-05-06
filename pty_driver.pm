@@ -362,10 +362,10 @@ sub drive (&) {
                     # works well for screen window switching, but still
                     # haven't figured out the right incantation for tmux.
                 }
-                elsif (/^($PREFIX_RE)$script_name( on| off)\s/m) {
+                elsif (/^($PREFIX_RE)$script_name( on| off)(\s)/m) {
                     my $state = $2;
                     $disabled = $state eq " off" ? 1 : 0;
-                    s//$1$script_name turned$state./m;
+                    s//$1$script_name turned$state.$3/m;
                     write_master;
                 }
                 elsif ($disabled) {
