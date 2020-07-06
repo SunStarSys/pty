@@ -5,6 +5,7 @@
 
 use strict;
 use warnings FATAL => 'all';
+use IPC::Open2;
 
 use lib "$ENV{HOME}/bin";
 use pty_driver;
@@ -32,6 +33,15 @@ drive {
         # verification for our own protection, typically carried
         # out by toggling the driver off temporarily first.
         write_slave "r\n";
+    }
+    elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m) {
+        echo_enabled or do {
+            my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
+            print $in getpw("OTP");
+            close $in;
+            write_slave <$out>;
+            waitpid $pid, 0;
+        };
     }
     elsif (/^$PREFIX_RE\QPassword$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
