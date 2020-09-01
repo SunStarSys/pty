@@ -43,7 +43,7 @@ def main():
     if os.stat(os.path.dirname(SOCKET)).st_mode & 0o7077:
         raise Exception("Insane permissions on '%s'" % SOCKET)
 
-    # fork. parent runs a server, child runs argv[1:].
+    # daemonize
     def handler(signum, stackframe):
         pid, exit = os.wait()
         sys.exit(exit)
