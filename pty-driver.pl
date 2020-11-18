@@ -43,7 +43,7 @@ drive {
             waitpid $pid, 0;
         };
     }
-    elsif (/^$PREFIX_RE\QPassword$NSM:/m) {
+    elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
         # on otherwise matching reads or similar. Note: running a bash
         # login shell on a remote host over ssh will always disable
