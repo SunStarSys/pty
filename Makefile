@@ -9,7 +9,7 @@ MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
 all:	${PROG} isatty
 
 isatty: isatty.o
-	cp $< $@
+	${LINK.c} -o $@ $^
 
 pty:	main.o loop.o driver.o error.o spipe.o ttymodes.o writen.o signalintr.o
 	${LINK.c} -o pty $^ ${LDLIBS}
