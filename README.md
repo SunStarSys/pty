@@ -90,6 +90,10 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+## Changes with  v1.1.6:
+
+- added isatty exectuable.
+
 
 ## Changes with v1.1.4:
 
