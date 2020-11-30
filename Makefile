@@ -6,7 +6,10 @@ SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
 
 
-all:	${PROG}
+all:	${PROG} isatty
+
+isatty: isatty.o
+	cp $< $@
 
 pty:	main.o loop.o driver.o error.o spipe.o ttymodes.o writen.o signalintr.o
 	${LINK.c} -o pty $^ ${LDLIBS}
@@ -31,7 +34,7 @@ install:all
 
 	@pkill -u $$USER pty-agent; ./pty-agent || sudo pip3 install setproctitle
 
-	cp -f ${PROG} ${SCRIPTS} ~/bin
+	cp -f ${PROG} isatty ${SCRIPTS} ~/bin
 
 clean:
 	rm -f ${PROGS} ${TEMPFILES}
