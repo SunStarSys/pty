@@ -1,5 +1,6 @@
 *.o
 .ccls-cache/
+isatty
 pty
 pty-*.tar.gz
 typescript*
