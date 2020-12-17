@@ -5,17 +5,16 @@
 # as gcc doesn't grok it.
 
 CC=gcc
-COMPILE.c=$(CC) $(CFLAGS) $(CPPFLAGS) -c
+COMPILE.c=$(CC) $(CFLAGSO) $(CPPFLAGS) -c
 NOANSICOMPILE.c=$(CC) $(NOANSICFLAGS) $(CPPFLAGS) -c
-LINK.c=$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
-LDLIBS=../libmisc.a
-S5LIB=/usr/5lib/libc.a
+LINK.c=$(CC) $(CFLAGSO) $(CPPFLAGS) $(LDFLAGS)
+
 # to get the System 5 versions of some system calls (getpgrp)
 
 # Common definitions
 
-CFLAGS	= -ansi -I/home/stevens/include -I/usr/include -Wall -Dsun
-CFLAGSO	= -ansi -I/home/stevens/include -I/usr/include -Wall -Dsun -O
+CFLAGS	= -Wall -Werror
+CFLAGSO	= -Wall -Werror -O2
 # We don't normally use -O with gcc on the sparc.
 # -I/home/stevens/include is to find the Sun headers that I've modified
 #		to be more ANSI & POSIX-1990 compliant.
@@ -28,5 +27,5 @@ NOANSICFLAGS = -I/home/stevens/include -I/usr/include
 LIB	= ../libmisc.a
 # Our library that almost every program needs.
 
-TEMPFILES = core core.* *.o temp.* *.out typescript*
+TEMPFILES = core core.* *.o temp.* *.out typescript* ${PROG} ${PROG}-*.tar.gz isatty
 # Common temp files to delete from each directory.

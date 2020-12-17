@@ -2,7 +2,11 @@
 #if defined(__APPLE__) || defined(__FreeBSD__)
 #include <util.h>
 #else
+#if defined(__Linux__)
 #include <pty.h>
+#else
+#include <termios.h>
+#endif
 #endif
 #include <sys/wait.h>
 #include "ourhdr.h"

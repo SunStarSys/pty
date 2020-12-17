@@ -20,5 +20,5 @@ CFLAGSO	= -Wall -Werror -O2
 LIB	= /home/stevens/libmisc.a
 # Our library that almost every program needs.
 
-TEMPFILES = core core.* *.o temp.* *.out typescript* ${PROG} ${PROG}-*.tar.gz
+TEMPFILES = core core.* *.o temp.* *.out typescript* ${PROG} ${PROG}-*.tar.gz isatty
 # Common temp files to delete from each directory.
