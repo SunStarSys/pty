@@ -44,7 +44,7 @@ drive {
         };
     }
     elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
-     aws   write_slave getpw("EMAIL") . "\n";
+        write_slave getpw("EMAIL") . "\n";
     }
     elsif (/^$PREFIX_RE\bPassword for '[^']+':/m) {
         echo_enabled or write_slave getpw("SYSTEM") . "\n";
