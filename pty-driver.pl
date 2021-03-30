@@ -43,6 +43,15 @@ drive {
             waitpid $pid, 0;
         };
     }
+    elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
+     aws   write_slave getpw("EMAIL") . "\n";
+    }
+    elsif (/^$PREFIX_RE\bPassword for '[^']+':/m) {
+        echo_enabled or write_slave getpw("SYSTEM") . "\n";
+    }
+    elsif (/^$PREFIX_RE\bEnter the password for/m) {
+        echo_enabled or write_slave getpw("1Password") . "\n";
+    }
     elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
         # on otherwise matching reads or similar. Note: running a bash
