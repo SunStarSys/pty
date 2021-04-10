@@ -1,12 +1,14 @@
 #include "ourhdr.h"
 #include "myhdr.h"
+#include <sys/wait.h>
 
-#define BUFFSIZE 4096
+#define BUFFSIZE 32768
 
 static void sig_term(int);
 static void sig_winch(int signo);
 static volatile sig_atomic_t termcaught;
 static volatile sig_atomic_t winchcaught;
+
 
 void
 loop(int ptym, int ignoreeof, int delay)
@@ -16,22 +18,18 @@ loop(int ptym, int ignoreeof, int delay)
     char buff[BUFFSIZE], ctrl_d = 4;
     Sigfunc* oldsig;
 
-    oldsig = signal_intr(SIGTERM, sig_term);
-    if (oldsig == SIG_ERR)
-        err_sys("signal_intr error for SIGTERM");
     oldsig = signal_intr(SIGWINCH, sig_winch);
     if (oldsig == SIG_ERR)
         err_sys("signal_intr error for SIGWINCH");
-    
+    oldsig = signal_intr(SIGTERM, sig_term);
+    if (oldsig == SIG_ERR)
+        err_sys("signal_intr error for SIGTERM");
     if ( (child = fork()) < 0)
         err_sys("fork error");
 
     else if (child == 0) { /* child copies stdin to ptym */
         if (signal_intr(SIGTERM, oldsig) == SIG_ERR)
             err_sys("signal_intr error for SIGTERM");
-        oldsig = signal_intr(SIGWINCH, sig_winch);
-        if (oldsig == SIG_ERR)
-            err_sys("signal_intr error for SIGWINCH");
 
         sleep(delay); /* wait for other jobs to settle */
 
@@ -61,7 +59,7 @@ loop(int ptym, int ignoreeof, int delay)
 
         /* We always terminate when we encounter an EOF on stdin,
            but we only notify the parent if ignoreeof is 0. */
-        if (ignoreeof == 0) {
+        else if (ignoreeof == 0) {
             sleep(1);
             kill(getppid(), SIGTERM); /* notify parent */
         }
@@ -93,7 +91,11 @@ PARENT_LOOP:
 
     if (termcaught == 0) /* tell child if it didn't send us the signal */
         kill(child, SIGTERM);
-    return;  /* parent returns to caller */
+
+    int status;
+    waitpid(child, &status, 0);
+
+    return;
 }
 
 /* The child sends us a SIGTERM when it receives an EOF on

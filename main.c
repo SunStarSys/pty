@@ -19,7 +19,7 @@ static void set_noecho(int);      /* at the end of this file */
 int
 main(int argc, char *argv[])
 {
-    int fdm, c, ignoreeof, interactive, noecho, verbose, status, delay;
+    int fdm, c, ignoreeof, interactive, noecho, verbose, status=0, delay;
     pid_t pid, d_pid = 0;
     char *driver, slave_name[20];
     struct termios orig_termios;
@@ -120,15 +120,17 @@ main(int argc, char *argv[])
     if (driver)
         d_pid = do_driver(driver); /* changes our stdin/stdout */
 
-    loop(fdm, ignoreeof, delay); /* copies stdin -> ptym, ptym -> stdout */
-
+    loop(fdm, ignoreeof, delay);
     if (close(fdm) != 0)
         err_sys("close failed");
 
     if (driver && waitpid(d_pid, &status, WNOHANG) != d_pid) {
         sleep(1); /* let io settle */
         kill(d_pid, SIGTERM);
+        waitpid(d_pid, &status, 0);
     }
+    if (WEXITSTATUS(status) != 0)
+      exit(WEXITSTATUS(status));
 
     waitpid(pid, &status, 0);
     exit(WEXITSTATUS(status));

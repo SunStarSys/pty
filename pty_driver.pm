@@ -6,11 +6,13 @@
 use strict;
 use warnings FATAL => 'all';
 
-use POSIX qw/ttyname isatty :termios_h/;
+use POSIX qw/ttyname isatty :termios_h _exit/;
 use Term::ReadKey;
 use IO::Select;
 use IO::Socket::UNIX;
 use File::Basename 'basename';
+use Fcntl qw/O_NONBLOCK F_SETFL F_GETFL/;
+
 
 =head2 INTRODUCTION
 
@@ -44,9 +46,11 @@ use constant MASTER_TTY_FD        => fileno STDERR; # 2
 
 use constant SLAVE_TTY_FD         => 3;
 
-use constant BUFSIZE              => 4096;
+use constant BUFSIZE              => 65536;
 
 use constant SOCKET_IO_TIMEOUT    => 3;
+
+use constant TTY_WRITE_TIMEOUT    => 60;
 
 use constant TTY_READKEY_TIMEOUT  => 0.01;
 
@@ -91,10 +95,12 @@ for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
 sub write_master (;$);
 
 # Die cleanly if called for
-$SIG{__DIE__} = sub { write_master shift; sleep 1; kill INT => getppid; exit 1 };
+$SIG{__DIE__} = sub { write_master shift; sleep 1; _exit 255 };
 
 # pty's typical cleanup signal
-$SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; exit 255 };
+$SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; _exit 0 };
+
+#$SIG{PIPE} = sub { defined $mterm and ReadMode restore => $mterm; _exit 141 };
 
 # reset MASTER terminal (invoked on die() and normal exit(), not on signals)
 END { defined $mterm and ReadMode restore => $mterm; sleep 1; }
@@ -149,7 +155,7 @@ sub write_master (;$) {
     my $wrote = 0;
     local $@;
     eval {
-        alarm SOCKET_IO_TIMEOUT;
+        alarm TTY_WRITE_TIMEOUT;
         do {
             my $w = syswrite $mterm, $_, $blen - $wrote, $wrote;
             die "syswrite failed: $!" unless $w >= 0;
@@ -174,7 +180,7 @@ sub write_slave (;$) {
     my $wrote = 0;
     local $@;
     eval {
-        alarm SOCKET_IO_TIMEOUT;
+        alarm TTY_WRITE_TIMEOUT;
         do {
             my $w = syswrite $sterm, $_, $blen - $wrote, $wrote;
             die "syswrite failed: $!" unless $w >= 0;
@@ -182,7 +188,7 @@ sub write_slave (;$) {
         } while $wrote < $blen;
         alarm 0;
     };
-    $@ and die $@;
+    die $@ if $@;
     return $wrote;
 }
 
@@ -195,10 +201,11 @@ Returns length of $_.
 
 sub read_input_nb ($) {
     my $r = shift; # either a socket or a terminal - either way ReadKey will work
-    sysread $r, $_, BUFSIZE or return;
-    while (defined(my $key = ReadKey TTY_READKEY_TIMEOUT, $r)) {
-        $_ .= $key;
-    }
+    my $flags = fcntl $r, F_GETFL, 0 or die "fcntl F_GETFL: $!";
+    $_ = "";
+    fcntl $r, F_SETFL, $flags | O_NONBLOCK or die "fcntl F_SETFL O_NONBLOCK: $!";
+    while (defined read($r, $_, BUFSIZE, length)) { select undef, undef, undef, TTY_READKEY_TIMEOUT }
+    fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
     return length;
 }
 
@@ -264,6 +271,9 @@ $(pty-agent) over its secure Unix domain socket, and returns it.
 
 =cut
 
+my $clear = `clear`;
+
+
 sub getpw ($;$) {
     my ($type, $prompt) = @_;
     index($type, ' ') >= 0
@@ -295,13 +305,13 @@ sub getpw ($;$) {
                          # not hang pty-agent since it doesn't multiplex.
         }
 
-        return $reply;
+        return "$reply\n";
     }
     else {
       NO_SOCKET:
         $secret{$type} = prompt $type if $prompt or $saw_pw{$type}++
             or not $secret{$type};
-        return $secret{$type};
+        return "$secret{$type}\n";
     }
 }
 
@@ -343,7 +353,6 @@ sub drive (&) {
     # toggle to deactivate automatic responses from this script when true
     my $disabled = 0;
     my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
-    my $clear = `clear`;
 
     local $_;
 

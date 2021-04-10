@@ -44,13 +44,13 @@ drive {
         };
     }
     elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
-        write_slave getpw("EMAIL") . "\n";
+        write_slave getpw("EMAIL");
     }
     elsif (/^$PREFIX_RE\bPassword for '[^']+':/m) {
-        echo_enabled or write_slave getpw("SYSTEM") . "\n";
+        echo_enabled or (write_slave getpw("SYSTEM") and write_master `clear`);
     }
     elsif (/^$PREFIX_RE\bEnter the password for/m) {
-        echo_enabled or write_slave getpw("1Password") . "\n";
+        echo_enabled or (write_slave getpw("1Password") and write_master `clear`);
     }
     elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
@@ -59,10 +59,11 @@ drive {
         # echo on the SLAVE terminal, so be careful that you actually
         # trust the foreign host's executables unless you use
         # zsh, which behaves appropriately.
-        echo_enabled or write_slave getpw("SYSTEM") . "\n";
+        echo_enabled or (write_slave getpw("SYSTEM") and write_master `clear`);
     }
+
     elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
-        echo_enabled or write_slave getpw("SSH") . "\n";
+        echo_enabled or (write_slave getpw("SSH") and write_master `clear`);
     }
     #
     # to extend the functionality of this script, add new elsif blocks
