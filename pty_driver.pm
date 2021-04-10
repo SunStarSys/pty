@@ -100,8 +100,6 @@ $SIG{__DIE__} = sub { write_master shift; sleep 1; _exit 255 };
 # pty's typical cleanup signal
 $SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; _exit 0 };
 
-#$SIG{PIPE} = sub { defined $mterm and ReadMode restore => $mterm; _exit 141 };
-
 # reset MASTER terminal (invoked on die() and normal exit(), not on signals)
 END { defined $mterm and ReadMode restore => $mterm; sleep 1; }
 
