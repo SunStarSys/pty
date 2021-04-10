@@ -82,6 +82,6 @@ drive {
     else {
         return 0; # not handled by us
     }
-
+    write_master `clear`;
     return 1; # handled successfully
 }
