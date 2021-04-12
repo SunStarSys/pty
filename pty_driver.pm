@@ -65,7 +65,7 @@ if that's hard to ferret out just use lsof on the socket as below.
 
 =cut
 
-system qq(pgrep -fu $ENV{USER} pty-agent >/dev/null 2>&1 || exec pty-agent);
+system qq(pgrep -u $ENV{USER} pty-agent >/dev/null 2>&1 || exec pty-agent);
 
 =pod
 
@@ -202,7 +202,9 @@ sub read_input_nb ($) {
     my $flags = fcntl $r, F_GETFL, 0 or die "fcntl F_GETFL: $!";
     $_ = "";
     fcntl $r, F_SETFL, $flags | O_NONBLOCK or die "fcntl F_SETFL O_NONBLOCK: $!";
-    while (defined read($r, $_, BUFSIZE, length)) { select undef, undef, undef, TTY_READKEY_TIMEOUT }
+    while (defined read($r, $_, BUFSIZE, length)) {
+        select undef, undef, undef, TTY_READKEY_TIMEOUT;
+    }
     fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
     return length;
 }
