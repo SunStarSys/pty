@@ -90,6 +90,14 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+
+## Changes with  v1.1.7:
+
+- better non-blocking read implementation
+
+- clears screen during getpw calls (screen + tmux support!)
+
+
 ## Changes with  v1.1.6:
 
 - added isatty exectuable.
