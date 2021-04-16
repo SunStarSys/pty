@@ -1,6 +1,6 @@
 include Make.def.clang
 
-VERSION = 1.1.7
+VERSION = 1.1.8-dev
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
@@ -32,7 +32,7 @@ install:all
 	    && sudo cpan install IO::Select Term::ReadKey) \
 	|| (echo "Installation Failed!" >&2 && false)
 
-	@pkill -u $$USER pty-agent; ./pty-agent || sudo pip3 install setproctitle
+	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && sudo pip3 install setproctitle )
 
 	cp -f ${PROG} isatty ${SCRIPTS} ~/bin
 
