@@ -16,8 +16,8 @@ while [ -n "$1" -a "`echo $1 | cut -d- -f1`" == "" ]; do
     shift
 done
 
-file=${1:-typescript}
-cmd=${2:-$SHELL}
+file=${1-typescript}
+cmd=${2-$SHELL}
 shift
 shift
 
@@ -30,7 +30,7 @@ if [ $quiet -eq 0 ]; then
     fi
 fi
 
-SCRIPT=$file pty -- $cmd $@ | tee -a $file
+SCRIPT=$file pty -- $cmd "$@" | tee -a $file
 
 if [ $quiet -eq 0 ]; then
     echo                       >> $file
