@@ -22,18 +22,18 @@ shift
 shift
 
 if [ $quiet -eq 0 ]; then
-    echo Script started, file is $file
-    if [ $append -eq 1 ]; then
-        echo Script started on `date` >> $file
-    else
-        echo Script started on `date` > $file
-    fi
+  echo Script started, file is $file
+fi
+if [ $append -eq 1 ]; then
+  echo Script started on `date` >> $file
+else
+  echo Script started on `date` > $file
 fi
 
 SCRIPT=$file pty -- $cmd "$@" | tee -a $file
 
+echo >> $file
+echo Script done on `date` >> $file
 if [ $quiet -eq 0 ]; then
-    echo                       >> $file
-    echo Script done on `date` >> $file
     echo Script done, file is $file
 fi
