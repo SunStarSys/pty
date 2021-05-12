@@ -30,6 +30,8 @@ else
   echo Script started on `date` > $file
 fi
 
+echo command: $cmd "$@" >> $file
+
 SCRIPT=$file pty -- $cmd "$@" | tee -a $file
 
 echo >> $file
