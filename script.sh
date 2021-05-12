@@ -37,3 +37,4 @@ echo Script done on `date` >> $file
 if [ $quiet -eq 0 ]; then
     echo Script done, file is $file
 fi
+echo
