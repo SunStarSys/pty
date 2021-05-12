@@ -8,7 +8,7 @@ CC=clang
 COMPILE.c=$(CC) $(CFLAGSOG) $(CPPFLAGS) -c
 LINK.c=$(CC) $(CFLAGSO) $(CPPFLAGS) $(LDFLAGS)
 LDLIBS=-lutil
-
+LDFLAGS=-static
 # Common definitions
 
 CFLAGS	= -Wall -Werror
