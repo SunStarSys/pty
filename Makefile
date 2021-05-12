@@ -10,9 +10,11 @@ all:	${PROG} isatty
 
 isatty: isatty.o
 	${LINK.c} -o $@ $^
+	strip $@
 
 pty:	main.o loop.o driver.o error.o spipe.o ttymodes.o writen.o signalintr.o
 	${LINK.c} -o pty $^ ${LDLIBS}
+	strip $@
 
 install:all
 	@[ "${USER}" != "root" ] \
