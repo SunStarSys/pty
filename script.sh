@@ -12,14 +12,14 @@ while getopts aq o; do
     esac
 done
 
-while [ -n "$1" -a "`echo $1 | cut -d- -f1`" == "" ]; do
+while [ ! "$1" = "$(echo "$1" | sed -e 's/^-//')" ]; do
     shift
 done
 
 file=${1-typescript}
 cmd=${2-$SHELL}
 shift
-shift
+[ $# -gt 0 ] && shift
 
 if [ $quiet -eq 0 ]; then
   echo Script started, file is $file
