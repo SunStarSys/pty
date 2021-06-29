@@ -304,14 +304,14 @@ sub getpw ($;$) {
                          # also nicely ensures the $socket gets closed first to
                          # not hang pty-agent since it doesn't multiplex.
         }
-        # write_master $clear;
+        write_master $clear;
         return "$reply\n";
     }
     else {
       NO_SOCKET:
         $secret{$type} = prompt $type if $prompt or $saw_pw{$type}++
             or not $secret{$type};
-        # write_master $clear;
+        write_master $clear;
         return "$secret{$type}\n";
     }
 }
