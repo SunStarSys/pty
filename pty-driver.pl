@@ -46,10 +46,10 @@ drive {
     elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
         write_slave getpw("EMAIL");
     }
-    elsif (/^$PREFIX_RE\bPassword for '[^']+':/m) {
+    elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m) {
         echo_enabled or write_slave getpw("SYSTEM");
     }
-    elsif (/^$PREFIX_RE\bEnter the password for/m) {
+    elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
         echo_enabled or write_slave getpw("1Password");
     }
     elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
