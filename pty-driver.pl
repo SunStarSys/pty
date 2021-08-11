@@ -80,12 +80,13 @@ drive {
         # accept the default for this apt-get prompt
         write_slave "\n";
     }
-    elsif (m!\b(https://[\w.-]+/[$URI::uric]+)!m and exists $ENV{MOZILLA}) {
+    elsif (exists $ENV{MOZILLA} and m!https://[\w.-]+/[$URI::uric]+!) {
         # use a port to evade this url pattern on the command-line (history!)
-        my $url = $1;
-        my $pw = getpw($url);
-        system($ENV{MOZILLA} => $url) if $pw =~ /y/i;
-        write_slave "\n";
+        while (m!\b(https://[\w.-]+/[$URI::uric]+)!g) {
+            my $url = $1;
+            my $pw = getpw($url, 1);
+            system($ENV{MOZILLA} => $url), write_slave "\n" if $pw =~ /y/i;
+        }
     }
     else {
         return 0; # not handled by us
