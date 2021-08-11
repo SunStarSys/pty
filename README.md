@@ -97,6 +97,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - clears screen during getpw calls (screen + tmux support!)
 
+- url automation in pty-driver.pl
+
 
 ## Changes with  v1.1.6:
 

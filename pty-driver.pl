@@ -6,6 +6,7 @@
 use strict;
 use warnings FATAL => 'all';
 use IPC::Open2;
+use URI;
 
 use lib "$ENV{HOME}/bin";
 use pty_driver;
@@ -77,6 +78,13 @@ drive {
     }
     elsif (m!^$PREFIX_RE\QDo you want$NSM to continue? [Y/n]!m) {
         # accept the default for this apt-get prompt
+        write_slave "\n";
+    }
+    elsif (m!\b(https://[\w.-]+/[$URI::uric]+)!m and exists $ENV{MOZILLA}) {
+        # use a port to evade this url pattern on the command-line (history!)
+        my $url = $1;
+        my $pw = getpw($url);
+        system($ENV{MOZILLA} => $url) if $pw =~ /y/i;
         write_slave "\n";
     }
     else {
