@@ -82,7 +82,9 @@ drive {
     }
     elsif (exists $ENV{MOZILLA} and m!https://[\w.-]+/[$URI::uric]+!) {
         # use a port to evade this url pattern on the command-line (history!)
+        my %url_cache;
         while (m!\b(https://[\w.-]+/[$URI::uric]+)!g) {
+            next if $url_cache{$1}++;
             my $url = $1;
             my $pw = getpw($url, 1);
             system($ENV{MOZILLA} => $url), write_slave "\n" if $pw =~ /y/i;
