@@ -83,7 +83,7 @@ drive {
     elsif (exists $ENV{MOZILLA}) {
         # use a port to evade this url pattern on the command-line (history!)
         my (%url_cache, $match);
-        while (m!\b(https://[\w.-]+/[$URI::uric]+)!g) {
+        while (m!\b(https://[\w.-]+/[$URI::uric#]+)!g) {
             $match++;
             next if $url_cache{$1}++;
             my $url = $1;
