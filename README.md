@@ -91,16 +91,19 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
-## Changes with  v1.1.7:
+## Changes with v1.1.8:
+
+- url automation in pty-driver.pl
+
+
+## Changes with v1.1.7:
 
 - better non-blocking read implementation
 
 - clears screen during getpw calls (screen + tmux support!)
 
-- url automation in pty-driver.pl
 
-
-## Changes with  v1.1.6:
+## Changes with v1.1.6:
 
 - added isatty exectuable.
 
