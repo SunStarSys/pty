@@ -40,14 +40,14 @@ protected ssh private keys.
 
 The trick with cron+ansible is to avoid the need for pty-driver.pl to call
 prompt(), by ensuring all of the required credentials are present in the
-already-running `pty-agent` daemon.  If needed, pipe `sleep 30` to the `pty`
+already-running `pty-agent` daemon. If needed, pipe `sleep 30` to the `pty`
 process on your cron'd ansible script to ensure ansible doesn't reject cron's
 closed STDIN.
 
 `C`-wise, it's just a little hacking beyond what you see in W. Richard Stevens'
 _Advanced Programming in the Unix Environment_. `Perl5`-wise, there's a lot
-of stuff going on, but the only module dependencies are `IO::Select` and `Term::ReadKey`.
-`Python3-wise` it just depends on the `setproctitle` module.
+of stuff going on, but the only module dependencies are `URI`, `IO::Select`,
+and `Term::ReadKey`. `Python3-wise` it just depends on the `setproctitle` module.
 
 ## LICENSE
 
@@ -94,6 +94,8 @@ Do not `make install` as root, it will prevent you from doing so.
 ## Changes with v1.1.8:
 
 - url automation in pty-driver.pl
+
+- ansible vault automation in pty-driver.pl
 
 
 ## Changes with v1.1.7:

@@ -53,6 +53,9 @@ drive {
     elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
         echo_enabled or write_slave getpw("1Password");
     }
+    elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
+        echo_enabled or write_slave getpw("Vault");
+    }
     elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
         # stop here unless echo is off to protect against driver replies
         # on otherwise matching reads or similar. Note: running a bash
