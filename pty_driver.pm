@@ -86,10 +86,10 @@ my ($mterm, $sterm);
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
      [\$sterm, SLAVE_TTY_FD,  sub {}])
 {
-    open ${$$_[0]}, "+<&=" . $$_[1]
-        or die "Can't open $$_[1]: $!";
-    isatty ${$$_[0]} or warn "$$_[1] not a tty!";
-    $$_[2]->();
+  open ${$$_[0]}, "+<&=" . $$_[1]
+    or die "Can't open $$_[1]: $!";
+  isatty ${$$_[0]} or warn "$$_[1] not a tty!";
+  $$_[2]->();
 }
 
 sub write_master (;$);
@@ -117,27 +117,26 @@ Returns true if the slave terminal has echo enabled.
 my $stermios = POSIX::Termios->new;
 
 sub echo_enabled () {
-    $stermios->getattr(SLAVE_TTY_FD);
-    return ECHO == (ECHO & $stermios->getlflag);
+  $stermios->getattr(SLAVE_TTY_FD);
+  return ECHO == (ECHO & $stermios->getlflag);
 }
 
 # these two subs are here just-in-case they prove useful (not yet so)
 
 sub disable_echo () {
-    $stermios->getattr(SLAVE_TTY_FD);
-    $stermios->setlflag($stermios->getlflag & ~(ECHO | ECHOE | ECHONL | ECHOK));
-    defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
-    select undef, undef, undef, TTY_READKEY_TIMEOUT;
-    die "Can't disable echo on slave: $!" if echo_enabled;
-
+  $stermios->getattr(SLAVE_TTY_FD);
+  $stermios->setlflag($stermios->getlflag & ~(ECHO | ECHOE | ECHONL | ECHOK));
+  defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
+  select undef, undef, undef, TTY_READKEY_TIMEOUT;
+  die "Can't disable echo on slave: $!" if echo_enabled;
 }
 
 sub enable_echo () {
-    $stermios->getattr(SLAVE_TTY_FD);
-    $stermios->setlflag($stermios->getlflag | (ECHO | ECHOE | ECHONL | ECHOK));
-    defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
-    select undef, undef, undef, TTY_READKEY_TIMEOUT;
-    die "Can't enable echo on slave: $!" unless echo_enabled;
+  $stermios->getattr(SLAVE_TTY_FD);
+  $stermios->setlflag($stermios->getlflag | (ECHO | ECHOE | ECHONL | ECHOK));
+  defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
+  select undef, undef, undef, TTY_READKEY_TIMEOUT;
+  die "Can't enable echo on slave: $!" unless echo_enabled;
 }
 
 =item write_master (;$)
@@ -148,21 +147,21 @@ Silently returns false if SOCKET_IO_TIMEOUT is exceeded.
 =cut
 
 sub write_master (;$) {
-    local ($_) = (@_, $_);
-    my $blen = length or return;
-    my $wrote = 0;
-    local $@;
-    eval {
-        alarm TTY_WRITE_TIMEOUT;
-        do {
-            my $w = syswrite $mterm, $_, $blen - $wrote, $wrote;
-            die "syswrite failed: $!" unless $w >= 0;
-            $wrote += $w;
-        } while $wrote < $blen;
-        alarm 0;
-    };
-    die $@ if $@;
-    return $wrote;
+  local ($_) = (@_, $_);
+  my $blen = length or return;
+  my $wrote = 0;
+  local $@;
+  eval {
+    alarm TTY_WRITE_TIMEOUT;
+    do {
+      my $w = syswrite $mterm, $_, $blen - $wrote, $wrote;
+      die "syswrite failed: $!" unless $w >= 0;
+      $wrote += $w;
+    } while $wrote < $blen;
+    alarm 0;
+  };
+  die $@ if $@;
+  return $wrote;
 }
 
 =item write_slave (;$)
@@ -173,21 +172,21 @@ Will die if the SOCKET_IO_TIMEOUT is exceeded.
 =cut
 
 sub write_slave (;$) {
-    local ($_) = (@_, $_);
-    my $blen = length or return;
-    my $wrote = 0;
-    local $@;
-    eval {
-        alarm TTY_WRITE_TIMEOUT;
-        do {
-            my $w = syswrite $sterm, $_, $blen - $wrote, $wrote;
-            die "syswrite failed: $!" unless $w >= 0;
-            $wrote += $w;
-        } while $wrote < $blen;
-        alarm 0;
-    };
-    die $@ if $@;
-    return $wrote;
+  local ($_) = (@_, $_);
+  my $blen = length or return;
+  my $wrote = 0;
+  local $@;
+  eval {
+    alarm TTY_WRITE_TIMEOUT;
+    do {
+      my $w = syswrite $sterm, $_, $blen - $wrote, $wrote;
+      die "syswrite failed: $!" unless $w >= 0;
+      $wrote += $w;
+    } while $wrote < $blen;
+    alarm 0;
+  };
+  die $@ if $@;
+  return $wrote;
 }
 
 =item read_input_nb ($)
@@ -198,15 +197,15 @@ Returns length of $_.
 =cut
 
 sub read_input_nb ($) {
-    my $r = shift; # either a socket or a terminal - either way ReadKey will work
-    my $flags = fcntl $r, F_GETFL, 0 or die "fcntl F_GETFL: $!";
-    $_ = "";
-    fcntl $r, F_SETFL, $flags | O_NONBLOCK or die "fcntl F_SETFL O_NONBLOCK: $!";
-    while (defined read($r, $_, BUFSIZE, length)) {
-        select undef, undef, undef, TTY_READKEY_TIMEOUT;
-    }
-    fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
-    return length;
+  my $r = shift; # either a socket or a terminal - either way ReadKey will work
+  my $flags = fcntl $r, F_GETFL, 0 or die "fcntl F_GETFL: $!";
+  $_ = "";
+  fcntl $r, F_SETFL, $flags | O_NONBLOCK or die "fcntl F_SETFL O_NONBLOCK: $!";
+  while (defined read($r, $_, BUFSIZE, length)) {
+    select undef, undef, undef, TTY_READKEY_TIMEOUT;
+  }
+  fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
+  return length;
 }
 
 
@@ -217,33 +216,33 @@ Prompt master terminal for a password of a given argument $type and return it.
 =cut
 
 sub prompt ($) {
-    my $type = shift;
-    # block these to avoid leaving $mterm in a non-echo state
-    local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
+  my $type = shift;
+  # block these to avoid leaving $mterm in a non-echo state
+  local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
 
-    ReadMode noecho => $mterm;
-    write_master "\n$type Password (^D aborts $script_name): "; # aborting will terminate pty
-    no warnings 'uninitialized';
-    chomp(my $passwd = ReadLine 0, $mterm);
-    defined $passwd or die "Operation aborted";
-    ReadMode "ultra-raw" => $mterm;
-    return $passwd;
+  ReadMode noecho => $mterm;
+  write_master "\n$type Password (^D aborts $script_name): "; # aborting will terminate pty
+  no warnings 'uninitialized';
+  chomp(my $passwd = ReadLine 0, $mterm);
+  defined $passwd or die "Operation aborted";
+  ReadMode "ultra-raw" => $mterm;
+  return $passwd;
 }
 
 # monkey-patch timeout wrapper around $socket method calls to pty-agent.
 
 sub IO::Socket::UNIX::timed_call {
-    my $obj = shift;
-    my $method = shift;
-    local $@; # avoid global pollution since our eval block otherwise will
-    my @rv;
-    my $list_context = wantarray; # eval changes wantarray, which we don't want.
-    eval {
-        alarm SOCKET_IO_TIMEOUT;
-        @rv = $list_context ? $obj->$method(@_) : scalar $obj->$method(@_);
-        alarm 0;
-    };
-    return $list_context ? @rv : $rv[0];
+  my $obj = shift;
+  my $method = shift;
+  local $@; # avoid global pollution since our eval block otherwise will
+  my @rv;
+  my $list_context = wantarray; # eval changes wantarray, which we don't want.
+  eval {
+    alarm SOCKET_IO_TIMEOUT;
+    @rv = $list_context ? $obj->$method(@_) : scalar $obj->$method(@_);
+    alarm 0;
+  };
+  return $list_context ? @rv : $rv[0];
 }
 
 my %saw_pw;   # status flags by type to differentiate login success or
@@ -275,45 +274,45 @@ my $clear = `clear`;
 
 
 sub getpw ($;$) {
-    my ($type, $prompt) = @_;
-    index($type, ' ') >= 0
-        and die "getpw(): invalid type '$type' contains a space char!";
+  my ($type, $prompt) = @_;
+  index($type, ' ') >= 0
+    and die "getpw(): invalid type '$type' contains a space char!";
 
-    if (-S PTY_AGENT_SOCKET) {
+  if (-S PTY_AGENT_SOCKET) {
 
-        my $socket = IO::Socket::UNIX->new(
-          Domain => AF_UNIX,
-          Type => SOCK_STREAM,
-          Peer => PTY_AGENT_SOCKET,
-          ) or warn "Can't connect to pty-agent socket: $!\n"
-              and goto NO_SOCKET;
+    my $socket = IO::Socket::UNIX->new(
+      Domain => AF_UNIX,
+      Type => SOCK_STREAM,
+      Peer => PTY_AGENT_SOCKET,
+      ) or warn "Can't connect to pty-agent socket: $!\n"
+        and goto NO_SOCKET;
 
-        if ($prompt or $saw_pw{$type}++) {
-            my $newvalue = prompt $type;
-            $socket->timed_call(send => "SET $type $newvalue\n");
-        }
-
-        $socket->timed_call(send => "GET $type\n");
-        my $reply = $socket->timed_call(getline => ());
-        defined $reply and chomp $reply;
-
-        if (not defined $reply or not length $reply) {
-            # this implies pty-agent requires pw initialization or it timed out.
-
-            goto &getpw; # induce a prompt this time since $saw_pw{$type} >= 1.
-                         # also nicely ensures the $socket gets closed first to
-                         # not hang pty-agent since it doesn't multiplex.
-        }
-        write_master $clear;
-        return "$reply\n";
+    if ($prompt or $saw_pw{$type}++) {
+      my $newvalue = prompt $type;
+      $socket->timed_call(send => "SET $type $newvalue\n");
     }
-    else {
-      NO_SOCKET:
-        $secret{$type} = prompt $type if $prompt or $saw_pw{$type}++
-            or not $secret{$type};
-        write_master $clear;
-        return "$secret{$type}\n";
+
+    $socket->timed_call(send => "GET $type\n");
+    my $reply = $socket->timed_call(getline => ());
+    defined $reply and chomp $reply;
+
+    if (not defined $reply or not length $reply) {
+      # this implies pty-agent requires pw initialization or it timed out.
+
+      goto &getpw; # induce a prompt this time since $saw_pw{$type} >= 1.
+      # also nicely ensures the $socket gets closed first to
+      # not hang pty-agent since it doesn't multiplex.
     }
+    write_master $clear;
+    return "$reply\n";
+  }
+  else {
+  NO_SOCKET:
+    $secret{$type} = prompt $type if $prompt or $saw_pw{$type}++
+      or not $secret{$type};
+    write_master $clear;
+    return "$secret{$type}\n";
+  }
 }
 
 
@@ -349,56 +348,56 @@ as argument, which should return true if the code block "handled" $_.
 =cut
 
 sub drive (&) {
-    my $custom_handler = shift;
+  my $custom_handler = shift;
 
-    # toggle to deactivate automatic responses from this script when true
-    my $disabled = 0;
-    my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
+  # toggle to deactivate automatic responses from this script when true
+  my $disabled = 0;
+  my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
 
-    local $_;
+  local $_;
 
-    while (my @readable = $s->can_read) {
+  while (my @readable = $s->can_read) {
 
-        for my $r (@readable) {
-            # a normal exit here can happen when the driven process shuts down.
-            read_input_nb $r or exit;
+    for my $r (@readable) {
+      # a normal exit here can happen when the driven process shuts down.
+      read_input_nb $r or exit;
 
-            if ($r != $mterm) {
-                # write SLAVE output in $_ to MASTER so we can see it.
-                write_master;
+      if ($r != $mterm) {
+        # write SLAVE output in $_ to MASTER so we can see it.
+        write_master;
 
-                if (index($_, $clear) >= 0) {
-                    # don't process window clears (during a redraw).
-                    # works well for screen window switching, but still
-                    # haven't figured out the right incantation for tmux.
-                }
-                elsif (/^($PREFIX_RE)$script_name( on| off)(\s)/m) {
-                    my $state = $2;
-                    $disabled = $state eq " off" ? 1 : 0;
-                    s//$1$script_name turned$state.$3/m;
-                    write_master;
-                }
-                elsif ($disabled) {
-                    # prevent any further driver processing
-                }
-                elsif ($custom_handler->()) {
-                    # handled by provided callback
-                }
-                elsif (/^$PREFIX_RE\S/m) {
-                    # this should always be the final elsif block here...
-                    # we saw something "printable" yet uninteresting to this
-                    # script at the beginning of a line from the driven process.
-                    %saw_pw = (); # not handled by anything seeking creds, so
-                                  # we flush the consecutive prompt bookkeeeping
-                }
-            }
-            else {
-                # this is a MASTER terminal read (aka typical KB input on
-                # $mterm), so send $_ to the SLAVE pty for terminal processing.
-                write_slave;
-            }
+        if (index($_, $clear) >= 0) {
+          # don't process window clears (during a redraw).
+          # works well for screen window switching, but still
+          # haven't figured out the right incantation for tmux.
         }
+        elsif (/^($PREFIX_RE)$script_name( on| off)(\s)/m) {
+          my $state = $2;
+          $disabled = $state eq " off" ? 1 : 0;
+          s//$1$script_name turned$state.$3/m;
+          write_master;
+        }
+        elsif ($disabled) {
+          # prevent any further driver processing
+        }
+        elsif ($custom_handler->()) {
+          # handled by provided callback
+        }
+        elsif (/^$PREFIX_RE\S/m) {
+          # this should always be the final elsif block here...
+          # we saw something "printable" yet uninteresting to this
+          # script at the beginning of a line from the driven process.
+          %saw_pw = (); # not handled by anything seeking creds, so
+          # we flush the consecutive prompt bookkeeeping
+        }
+      }
+      else {
+        # this is a MASTER terminal read (aka typical KB input on
+        # $mterm), so send $_ to the SLAVE pty for terminal processing.
+        write_slave;
+      }
     }
+  }
 }
 
 # check if called from do FILE or require FILE or use MODULE in another script.
@@ -416,22 +415,22 @@ return 1 if scalar caller;
 USER_SERVICEABLE_PARTS_BELOW_THIS_LINE:
 
 drive {
-    # this is the actual running program where user-customizable
-    # code changes (to test $_) go.  Returns true if we handled
-    # the line, false otherwise.
+  # this is the actual running program where user-customizable
+  # code changes (to test $_) go.  Returns true if we handled
+  # the line, false otherwise.
 
-    if (m!\Q(yes/${NSM}no\)?! or /'yes' or ${NSM}'no'/) {
-        # we always err on the side of caution,
-        # but this can be customized differently.
-        write_slave "no\n";
-    }
-    elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!m) {
-        # accept the default for this apt-get prompt
-        write_slave "\n";
-    }
-    else {
-        return 0; # not handled by us
-    }
+  if (m!\Q(yes/${NSM}no\)?! or /'yes' or ${NSM}'no'/) {
+    # we always err on the side of caution,
+    # but this can be customized differently.
+    write_slave "no\n";
+  }
+  elsif (m!^$PREFIX_RE\QDo you want to continue? [Y/n]!m) {
+    # accept the default for this apt-get prompt
+    write_slave "\n";
+  }
+  else {
+    return 0; # not handled by us
+  }
 
-    return 1; # handled successfully
+  return 1; # handled successfully
 }

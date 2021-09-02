@@ -18,86 +18,86 @@ our $PREFIX_RE;
 our $NSM;
 
 drive {
-    # this is the actual running program where user-customizable
-    # code changes (to test $_) go.  Returns true if we handled
-    # the contents of $_, false otherwise.
+  # this is the actual running program where user-customizable
+  # code changes (to test $_) go.  Returns true if we handled
+  # the contents of $_, false otherwise.
 
-    if (m!\(yes/${NSM}no\)\?! or /'yes' or ${NSM}'no'/) {
-        # we always err on the side of caution,
-        # but this can be customized differently.
-        write_slave "no\n";
-    }
-    elsif (/^$PREFIX_RE\Q(R)eject, accept (t)emporarily ${NSM}or accept (p)ermanently?/m) {
-        # this is a typical ssh unkown-host-key prompt.
-        # we do not want to be interrupted for automation,
-        # but we also don't want to be connecting without manual
-        # verification for our own protection, typically carried
-        # out by toggling the driver off temporarily first.
-        write_slave "r\n";
-    }
-    elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m) {
-        echo_enabled or do {
-            my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
-            print $in getpw("OTP");
-            close $in;
-            write_slave <$out>;
-            waitpid $pid, 0;
-        };
-    }
-    elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
-        write_slave getpw("EMAIL");
-    }
-    elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m) {
-        echo_enabled or write_slave getpw("SYSTEM");
-    }
-    elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
-        echo_enabled or write_slave getpw("1Password");
-    }
-    elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
-        echo_enabled or write_slave getpw("Vault");
-    }
-    elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
-        # stop here unless echo is off to protect against driver replies
-        # on otherwise matching reads or similar. Note: running a bash
-        # login shell on a remote host over ssh will always disable
-        # echo on the SLAVE terminal, so be careful that you actually
-        # trust the foreign host's executables unless you use
-        # zsh, which behaves appropriately.
-        echo_enabled or write_slave getpw("SYSTEM");
-    }
+  if (m!\(yes/${NSM}no\)\?! or /'yes' or ${NSM}'no'/) {
+    # we always err on the side of caution,
+    # but this can be customized differently.
+    write_slave "no\n";
+  }
+  elsif (/^$PREFIX_RE\Q(R)eject, accept (t)emporarily ${NSM}or accept (p)ermanently?/m) {
+    # this is a typical ssh unkown-host-key prompt.
+    # we do not want to be interrupted for automation,
+    # but we also don't want to be connecting without manual
+    # verification for our own protection, typically carried
+    # out by toggling the driver off temporarily first.
+    write_slave "r\n";
+  }
+  elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m) {
+    echo_enabled or do {
+      my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
+      print $in getpw("OTP");
+      close $in;
+      write_slave <$out>;
+      waitpid $pid, 0;
+    };
+  }
+  elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
+    write_slave getpw("EMAIL");
+  }
+  elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m) {
+    echo_enabled or write_slave getpw("SYSTEM");
+  }
+  elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
+    echo_enabled or write_slave getpw("1Password");
+  }
+  elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
+    echo_enabled or write_slave getpw("Vault");
+  }
+  elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
+    # stop here unless echo is off to protect against driver replies
+    # on otherwise matching reads or similar. Note: running a bash
+    # login shell on a remote host over ssh will always disable
+    # echo on the SLAVE terminal, so be careful that you actually
+    # trust the foreign host's executables unless you use
+    # zsh, which behaves appropriately.
+    echo_enabled or write_slave getpw("SYSTEM");
+  }
 
-    elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
-        echo_enabled or write_slave getpw("SSH");
+  elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
+    echo_enabled or write_slave getpw("SSH");
+  }
+  #
+  # to extend the functionality of this script, add new elsif blocks
+  # here to check for other types of login prompts you receive.
+  # Choose the login $type (no spaces!) to mark things appropriately
+  # in your getpw($type) call so it will be tracked properly
+  # by pty-agent.
+  #
+  elsif (/^$PREFIX_RE\QSorry,$NSM try again./m) {
+    # skip interceding sudo authentication error message
+  }
+  elsif (m!^$PREFIX_RE\QDo you want$NSM to continue? [Y/n]!m) {
+    # accept the default for this apt-get prompt
+    write_slave "\n";
+  }
+  elsif (exists $ENV{MOZILLA}) {
+    # use a port to evade this url pattern on the command-line (history!)
+    my (%url_cache, $match);
+    while (m!\b(https://[\w.-]+/[$URI::uric#]+)!g) {
+      $match++;
+      next if $url_cache{$1}++;
+      my $url = $1;
+      my $pw = getpw($url, 1);
+      system($ENV{MOZILLA} => $url), write_slave "\n" if $pw =~ /y/i;
     }
-    #
-    # to extend the functionality of this script, add new elsif blocks
-    # here to check for other types of login prompts you receive.
-    # Choose the login $type (no spaces!) to mark things appropriately
-    # in your getpw($type) call so it will be tracked properly
-    # by pty-agent.
-    #
-    elsif (/^$PREFIX_RE\QSorry,$NSM try again./m) {
-        # skip interceding sudo authentication error message
-    }
-    elsif (m!^$PREFIX_RE\QDo you want$NSM to continue? [Y/n]!m) {
-        # accept the default for this apt-get prompt
-        write_slave "\n";
-    }
-    elsif (exists $ENV{MOZILLA}) {
-        # use a port to evade this url pattern on the command-line (history!)
-        my (%url_cache, $match);
-        while (m!\b(https://[\w.-]+/[$URI::uric#]+)!g) {
-            $match++;
-            next if $url_cache{$1}++;
-            my $url = $1;
-            my $pw = getpw($url, 1);
-            system($ENV{MOZILLA} => $url), write_slave "\n" if $pw =~ /y/i;
-        }
-        return $match;
-    }
-    else {
-        return 0; # not handled by us
-    }
-    write_master `clear`;
-    return 1; # handled successfully
+    return $match;
+  }
+  else {
+    return 0; # not handled by us
+  }
+  write_master `clear`;
+  return 1; # handled successfully
 }
