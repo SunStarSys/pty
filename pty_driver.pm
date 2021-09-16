@@ -13,7 +13,6 @@ use IO::Socket::UNIX;
 use File::Basename 'basename';
 use Fcntl qw/O_NONBLOCK F_SETFL F_GETFL/;
 
-
 =head2 INTRODUCTION
 
 SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
@@ -55,7 +54,6 @@ use constant TTY_WRITE_TIMEOUT    => 60;
 use constant TTY_READKEY_TIMEOUT  => 0.01;
 
 use constant PTY_AGENT_SOCKET     => "$ENV{HOME}/.pty-agent/socket";
-
 
 =head2 INITIALIZATION
 
@@ -208,7 +206,6 @@ sub read_input_nb ($) {
   return length;
 }
 
-
 =item prompt ($)
 
 Prompt master terminal for a password of a given argument $type and return it.
@@ -272,7 +269,6 @@ $(pty-agent) over its secure Unix domain socket, and returns it.
 
 my $clear = `clear`;
 
-
 sub getpw ($;$) {
   my ($type, $prompt) = @_;
   index($type, ' ') >= 0
@@ -315,7 +311,6 @@ sub getpw ($;$) {
   }
 }
 
-
 # main:: globals for internal/external drive {} code blocks.
 
 =back
@@ -332,7 +327,6 @@ our $PREFIX_RE = qr/.*/; # everything on the current line
 
 our $NSM       = ''; # include this in regexps so as to not match themselves,
                      # e.g., for 'pty -d $0 -- $SHELL -c "cat $0"'
-
 
 =head2 DRIVER CORE FUNCTION
 
@@ -373,7 +367,7 @@ sub drive (&) {
         }
         elsif (/^($PREFIX_RE)$script_name( on| off)(\s)/m) {
           my $state = $2;
-          $disabled = $state eq " off" ? 1 : 0;
+          $disabled = $state eq " off";
           s//$1$script_name turned$state.$3/m;
           write_master;
         }
