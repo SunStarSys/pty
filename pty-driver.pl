@@ -53,6 +53,9 @@ drive {
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
     echo_enabled or write_slave getpw("1Password");
   }
+  elsif(/^$PREFIX_RE\[ERROR\].* 401 : Unauthorized/m) {
+    # skip to retry
+  }
   elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
     echo_enabled or write_slave getpw("Vault");
   }
