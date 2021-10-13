@@ -18,13 +18,14 @@ use Fcntl qw/O_NONBLOCK F_SETFL F_GETFL/;
 SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
 USE THIS WITH SHELLS/SCREEN!
 
-STDIN and STDOUT are dup2'd to a socketpaired Unix Socket by a pty child process.
-STDIN comes from the SLAVE terminal attached to pty's driven process and sent
-to us. STDOUT is written back to the SLAVE terminal which is delivered to that
-driven process's STDIN.  This represents the combined terminal interfaces of the
-driven process. STDERR is attached to the MASTER terminal (the one we can interface
-with directly via hardware devices), since pty dup2's the controlling pty process's
-STDIN to STDERR.
+STDIN and STDOUT are dup2'd to a socketpaired (and specifically not pipe2(2)'d because
+IO::Select's select(2) call below doesn't function well on fifos; that's the purpose of
+pselect(2)) Unix Socket by a pty child process. STDIN comes from the SLAVE terminal
+attached to pty's driven process and sent to us. STDOUT is written back to the SLAVE
+terminal which is delivered to that driven process's STDIN.  This represents the combined
+terminal interfaces of the driven process. STDERR is attached to the MASTER terminal
+(the one we can interface with directly via hardware devices), since pty dup2's the
+controlling pty process's STDIN to STDERR.
 
 Here's an example cron job that will run a shell script:
 
@@ -358,7 +359,7 @@ sub drive (&) {
       read_input_nb $r or exit;
 
       if ($r != $mterm) {
-        # write SLAVE output in $_ to MASTER so we can see it.
+        # adust driver activation status vie $ptyon_dir/$stty_name semaphore.
         s{^($PREFIX_RE)$script_name( on| off)(\s)}{
           if ($2 eq " on") {
             no warnings "once";
@@ -370,6 +371,7 @@ sub drive (&) {
           "$1$script_name turned$2.$3"
         }gem;
 
+        # write SLAVE output in $_ to MASTER so we can see it.
         write_master;
 
         if (index($_, $clear) >= 0) {
