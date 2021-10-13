@@ -118,7 +118,7 @@ main(int argc, char *argv[])
     }
 
     if (driver)
-        d_pid = do_driver(driver); /* changes our stdin/stdout */
+      d_pid = do_driver(driver, slave_name); /* changes our stdin/stdout */
 
     loop(fdm, ignoreeof, delay);
     if (close(fdm) != 0)

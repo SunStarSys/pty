@@ -1,12 +1,16 @@
 include Make.def.clang
 
-VERSION = 1.1.8-dev
+VERSION = 1.1.9-dev
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
 
 
-all:	${PROG} isatty
+all:	${PROG} isatty ttyname
+
+ttyname: ttyname.o
+	${LINK.c} -o $@ $^
+	strip $@
 
 isatty: isatty.o
 	${LINK.c} -o $@ $^
@@ -36,7 +40,7 @@ install:all
 
 	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && sudo pip3 install setproctitle )
 
-	cp -f ${PROG} isatty ${SCRIPTS} ~/bin
+	cp -f ${PROG} isatty ttyname ${SCRIPTS} ~/bin
 
 clean:
 	rm -f ${PROGS} ${TEMPFILES}

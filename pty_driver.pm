@@ -77,9 +77,9 @@ script w/o a controlling master terminal (eg cron apps).
 
 # adjusts toggle input line, matching unsuffixed $0
 my $script_name = basename $0, ".pl";
-my $stty_name = basename ttyname SLAVE_TTY_FD;
+my $stty_name = basename $ENV{STTY_NAME};
 my $ptyon_dir = "/tmp/ptyon-$ENV{USER}";
-system "mkdir -p $ptyon_dir && touch $ptyon_dir/$stty_name" and die $!;
+system "mkdir -m 0700 -p $ptyon_dir && touch $ptyon_dir/$stty_name" and die $!;
 
 # master/slave terminals
 my ($mterm, $sterm);
@@ -369,7 +369,7 @@ sub drive (&) {
           }
           "$1$script_name turned$2.$3"
         }gem;
-          
+
         write_master;
 
         if (index($_, $clear) >= 0) {

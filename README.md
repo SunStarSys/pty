@@ -98,6 +98,15 @@ Do not `make install` as root, it will prevent you from doing so.
 - ansible vault automation in pty-driver.pl
 
 
+## Changes with v1.1.9:
+
+- STTY_NAME env var to driver cmd
+
+- /tmp/ptyon-$USER/* to mark when driver is enabled
+
+- ttyname binary added
+
+
 ## Changes with v1.1.7:
 
 - better non-blocking read implementation

@@ -15,5 +15,5 @@ CFLAGS	= -Wall -Werror
 CFLAGSO	= -Wall -Werror -O2
 CFLAGSOG = -Wall -Werror -O2 -g
 
-TEMPFILES = core core.* *.o temp.* *.out typescript* isatty ${PROG} ${PROG}-*.tar.gz
+TEMPFILES = core core.* *.o temp.* *.out typescript* isatty ttyname ${PROG} ${PROG}-*.tar.gz
 # Common temp files to delete from each directory.

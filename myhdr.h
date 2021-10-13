@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-pid_t do_driver(char *);          /* in the file driver.c */
+pid_t do_driver(char *, char *);  /* in the file driver.c */
 void loop(int, int, int);         /* in the file loop.c */
 
 #endif /* __myhdr_h */

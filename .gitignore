@@ -1,5 +1,6 @@
 *.o
 .ccls-cache/
+ttyname
 isatty
 pty
 pty-*.tar.gz
