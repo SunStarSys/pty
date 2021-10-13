@@ -365,7 +365,7 @@ sub drive (&) {
             open my $dummy, ">", "$ptyon_dir/$stty_name";
           }
           else {
-            unlink "ptyon_dir/$stty_name";
+            unlink "$ptyon_dir/$stty_name";
           }
           "$1$script_name turned$2.$3"
         }gem;
