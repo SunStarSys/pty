@@ -77,6 +77,9 @@ script w/o a controlling master terminal (eg cron apps).
 
 # adjusts toggle input line, matching unsuffixed $0
 my $script_name = basename $0, ".pl";
+my $stty_name = basename ttyname SLAVE_TTY_FD;
+my $ptyon_dir = "/tmp/ptyon-$ENV{USER}";
+system "mkdir -p $ptyon_dir && touch $ptyon_dir/$stty_name" and die $!;
 
 # master/slave terminals
 my ($mterm, $sterm);
@@ -93,13 +96,13 @@ for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
 sub write_master (;$);
 
 # Die cleanly if called for
-$SIG{__DIE__} = sub { write_master shift; sleep 1; _exit 255 };
+$SIG{__DIE__} = sub { write_master shift; sleep 1; unlink "$ptyon_dir/$stty_name"; _exit 255 };
 
 # pty's typical cleanup signal
-$SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; _exit 0 };
+$SIG{TERM} = sub { defined $mterm and ReadMode restore => $mterm; unlink "$ptyon_dir/$stty_name"; _exit 0 };
 
 # reset MASTER terminal (invoked on die() and normal exit(), not on signals)
-END { defined $mterm and ReadMode restore => $mterm; sleep 1; }
+END { defined $mterm and ReadMode restore => $mterm; unlink "$ptyon_dir/$stty_name"; sleep 1; }
 
 
 =head2 HELPER FUNCTIONS
@@ -344,8 +347,6 @@ as argument, which should return true if the code block "handled" $_.
 sub drive (&) {
   my $custom_handler = shift;
 
-  # toggle to deactivate automatic responses from this script when true
-  my $disabled = 0;
   my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
 
   local $_;
@@ -358,6 +359,17 @@ sub drive (&) {
 
       if ($r != $mterm) {
         # write SLAVE output in $_ to MASTER so we can see it.
+        s{^($PREFIX_RE)$script_name( on| off)(\s)}{
+          if ($2 eq " on") {
+            no warnings "once";
+            open my $dummy, ">", "$ptyon_dir/$stty_name";
+          }
+          else {
+            unlink "ptyon_dir/$stty_name";
+          }
+          "$1$script_name turned$2.$3"
+        }gem;
+          
         write_master;
 
         if (index($_, $clear) >= 0) {
@@ -365,13 +377,7 @@ sub drive (&) {
           # works well for screen window switching, but still
           # haven't figured out the right incantation for tmux.
         }
-        elsif (/^($PREFIX_RE)$script_name( on| off)(\s)/m) {
-          my $state = $2;
-          $disabled = $state eq " off";
-          s//$1$script_name turned$state.$3/m;
-          write_master;
-        }
-        elsif ($disabled) {
+        elsif (! -f "$ptyon_dir/$stty_name") {
           # prevent any further driver processing
         }
         elsif ($custom_handler->()) {
