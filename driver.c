@@ -8,18 +8,6 @@ do_driver(char *driver, char* slave_name)
     pid_t child;
     int pipe[2];
 
-    char *user=getenv("USER"), *path=getenv("PATH"), *home=getenv("HOME"), *term=getenv("TERM"), *moz=getenv("MOZILLA"), *euser=malloc(strlen(user)+6), *epath=malloc(strlen(path)+6), *ehome=malloc(strlen(home)+6), *eterm=malloc(strlen(term)+6), *emoz=NULL, *eslave_name=malloc(strlen(slave_name)+11);
-    if (moz != NULL) {
-      emoz=malloc(strlen(moz)+9);
-      sprintf(emoz,"MOZILLA=%s", moz);
-    }
-    sprintf(euser,"USER=%s", user);
-    sprintf(epath,"PATH=%s", path);
-    sprintf(ehome,"HOME=%s", home);
-    sprintf(eterm,"TERM=%s", term);
-    sprintf(eslave_name,"STTY_NAME=%s", slave_name);
-
-    char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, NULL};
 
     /* create a stream pipe to communicate with the driver */
     if (socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, pipe) < 0)
@@ -41,7 +29,26 @@ do_driver(char *driver, char* slave_name)
         if (dup2(pipe[0], STDOUT_FILENO) != STDOUT_FILENO)
             err_sys("dup2 error to stdout");
         close(pipe[0]);
+
+        char *user=getenv("USER"), *path=getenv("PATH"), *home=getenv("HOME"),
+          *term=getenv("TERM"), *moz=getenv("MOZILLA"),
+          *euser=malloc(strlen(user)+6), *epath=malloc(strlen(path)+6),
+          *ehome=malloc(strlen(home)+6), *eterm=malloc(strlen(term)+6),
+          *emoz=NULL, *eslave_name=malloc(strlen(slave_name)+11);
+
+        if (moz != NULL) {
+          emoz=malloc(strlen(moz)+9);
+          sprintf(emoz,"MOZILLA=%s", moz);
+        }
+        sprintf(euser,"USER=%s", user);
+        sprintf(epath,"PATH=%s", path);
+        sprintf(ehome,"HOME=%s", home);
+        sprintf(eterm,"TERM=%s", term);
+        sprintf(eslave_name,"STTY_NAME=%s", slave_name);
+
+        char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, NULL};
         __environ = envp;
+
         execlp(driver, driver, (char *)NULL);
         err_sys("execlp error for: %s", driver);
     }
