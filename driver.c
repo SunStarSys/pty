@@ -17,7 +17,6 @@ do_driver(char *driver, char* slave_name)
     sprintf(epath,"PATH=%s", path);
     sprintf(ehome,"HOME=%s", home);
     sprintf(eterm,"TERM=%s", term);
-    sprintf(emoz,"MOZILLA=%s", moz);
     sprintf(eslave_name,"STTY_NAME=%s", slave_name);
 
     char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, NULL};
