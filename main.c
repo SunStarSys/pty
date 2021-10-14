@@ -15,6 +15,9 @@
 #define USAGE "Usage: pty [ -d driver -einvVh -t timeout ] -- program [ arg ... ]"
 
 static void set_noecho(int);      /* at the end of this file */
+#ifdef FORCE_SLAVE_ECHO
+static void set_echo(int);
+#endif
 
 int
 main(int argc, char *argv[])
@@ -99,6 +102,10 @@ main(int argc, char *argv[])
     else if (pid == 0) {  /* child */
         if (noecho)
             set_noecho(STDIN_FILENO); /* stdin is slave pty */
+#if FORCE_SLAVE_ECHO
+        else
+            set_echo(STDIN_FILENO);
+#endif
 
         if (execvp(argv[optind], &argv[optind]) < 0)
             err_sys("can't execute: %s", argv[optind]);
@@ -148,3 +155,17 @@ static void set_noecho(int fd)  /* turn off echo (for slave pty) */
     if (tcsetattr(fd, TCSANOW, &stermios) < 0)
         err_sys("tcsetattr error");
 }
+#ifdef FORCE_SLAVE_ECHO
+static void set_echo(int fd)  /* turn on echo (for slave pty) */
+{
+    struct termios stermios;
+
+    if (tcgetattr(fd, &stermios) < 0)
+        err_sys("tcgetattr error");
+
+    stermios.c_lflag |= (ECHO | ECHOE | ECHOK | ECHONL);
+
+    if (tcsetattr(fd, TCSANOW, &stermios) < 0)
+        err_sys("tcsetattr error");
+}
+#endif
