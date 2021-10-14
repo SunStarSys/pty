@@ -35,42 +35,40 @@ drive {
     # out by toggling the driver off temporarily first.
     write_slave "r\n";
   }
-  elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m) {
-    echo_enabled or do {
-      my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
-      print $in getpw("OTP");
-      close $in;
-      write_slave <$out>;
-      waitpid $pid, 0;
-    };
+  elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m and not echo_enabled) {
+    my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
+    print $in getpw("OTP");
+    close $in;
+    write_slave <$out>;
+    waitpid $pid, 0;
   }
   elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
     write_slave getpw("EMAIL");
   }
-  elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m) {
-    echo_enabled and return or write_slave getpw("SYSTEM");
+  elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m and not echo_enabled) {
+    write_slave getpw("SYSTEM");
   }
-  elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
-    echo_enabled and return or write_slave getpw("1Password");
+  elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m and not echo_enabled) {
+    write_slave getpw("1Password");
   }
   elsif(/^$PREFIX_RE\[ERROR\].* 401 : Unauthorized/m) {
     # skip to retry
   }
-  elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
-    echo_enabled and return or write_slave getpw("Vault");
+  elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m and not echo_enabled) {
+    write_slave getpw("Vault");
   }
-  elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
+  elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m and not echo_enabled) {
     # stop here unless echo is off to protect against driver replies
     # on otherwise matching reads or similar. Note: running a bash
     # login shell on a remote host over ssh will always disable
     # echo on the SLAVE terminal, so be careful that you actually
     # trust the foreign host's executables unless you use
     # zsh, which behaves appropriately.
-    echo_enabled and return or write_slave getpw("SYSTEM");
+    write_slave getpw("SYSTEM");
   }
 
-  elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
-    echo_enabled and return 1 or write_slave getpw("SSH");
+  elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
+    write_slave getpw("SSH");
   }
   #
   # to extend the functionality of this script, add new elsif blocks
