@@ -99,6 +99,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - ttyname, echoon, echooff binaries added
 
+- disabled insecure IN_BAND_TOGGLER
+
 
 ## Changes with v1.1.8:
 
