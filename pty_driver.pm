@@ -353,8 +353,6 @@ sub drive (&) {
 
   local $_;
 
-  enable_echo;
-
   while (my @readable = $s->can_read) {
 
     for my $r (@readable) {
