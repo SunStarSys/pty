@@ -91,7 +91,7 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
-## Changes with v1.1.9:
+## Changes with v2.0.0:
 
 - STTY_NAME env var to driver cmd
 
