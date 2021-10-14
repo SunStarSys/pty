@@ -91,20 +91,20 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
-## Changes with v1.1.8:
-
-- url automation in pty-driver.pl
-
-- ansible vault automation in pty-driver.pl
-
-
 ## Changes with v1.1.9:
 
 - STTY_NAME env var to driver cmd
 
 - /tmp/ptyon-$USER/* to mark when driver is enabled
 
-- ttyname binary added
+- ttyname, echoon, echooff binaries added
+
+
+## Changes with v1.1.8:
+
+- url automation in pty-driver.pl
+
+- ansible vault automation in pty-driver.pl
 
 
 ## Changes with v1.1.7:
