@@ -56,6 +56,8 @@ use constant TTY_READKEY_TIMEOUT  => 0.01;
 
 use constant PTY_AGENT_SOCKET     => "$ENV{HOME}/.pty-agent/socket";
 
+use constant IN_BAND_TOGGLER     => 0;
+
 =head2 INITIALIZATION
 
 Intitialize pty-agent if necessary. pty-agent sticks around until reboot, and
@@ -370,7 +372,7 @@ sub drive (&) {
             unlink "$ptyon_dir/$stty_name";
           }
           "$1$script_name turned$2.$3"
-        }gem;
+        }gem if IN_BAND_TOGGLER;
 
         # write SLAVE output in $_ to MASTER so we can see it.
         write_master;
