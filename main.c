@@ -102,7 +102,7 @@ main(int argc, char *argv[])
     else if (pid == 0) {  /* child */
         if (noecho)
             set_noecho(STDIN_FILENO); /* stdin is slave pty */
-#if FORCE_SLAVE_ECHO
+#ifdef FORCE_SLAVE_ECHO
         else
             set_echo(STDIN_FILENO);
 #endif
