@@ -120,7 +120,8 @@ my $stermios = POSIX::Termios->new;
 
 sub echo_enabled () {
   $stermios->getattr(SLAVE_TTY_FD);
-  return ECHO == (ECHO & $stermios->getlflag);
+  my $eflags = ECHO | ECHOE | ECHONL | ECHOK;
+  return $eflags == ($eflags & $stermios->getlflag);
 }
 
 # these two subs are here just-in-case they prove useful (not yet so)
@@ -351,6 +352,8 @@ sub drive (&) {
   my $s = IO::Select->new(\*STDIN, $mterm); # can't use $sterm because pty consumes its input
 
   local $_;
+
+  enable_echo;
 
   while (my @readable = $s->can_read) {
 
