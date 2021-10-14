@@ -46,7 +46,7 @@ clean:
 	rm -f ${PROGS} ${TEMPFILES}
 
 %.o:	%.c Make* *.h
-	${COMPILE.c} -DVERSION=\"${VERSION}\" -DFORCE_SLAVE_ECHO $< -o $@
+	${COMPILE.c} -DVERSION=\"${VERSION}\" $< -o $@
 
 manifest:
 	@rm -rf ${PROG}-${VERSION} && mkdir ${PROG}-${VERSION} && cp ${MANIFEST} ${PROG}-${VERSION}
