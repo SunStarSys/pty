@@ -48,16 +48,16 @@ drive {
     write_slave getpw("EMAIL");
   }
   elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m) {
-    echo_enabled or write_slave getpw("SYSTEM");
+    echo_enabled and return or write_slave getpw("SYSTEM");
   }
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m) {
-    echo_enabled or write_slave getpw("1Password");
+    echo_enabled and return or write_slave getpw("1Password");
   }
   elsif(/^$PREFIX_RE\[ERROR\].* 401 : Unauthorized/m) {
     # skip to retry
   }
   elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m) {
-    echo_enabled or write_slave getpw("Vault");
+    echo_enabled and return or write_slave getpw("Vault");
   }
   elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m) {
     # stop here unless echo is off to protect against driver replies
@@ -66,11 +66,11 @@ drive {
     # echo on the SLAVE terminal, so be careful that you actually
     # trust the foreign host's executables unless you use
     # zsh, which behaves appropriately.
-    echo_enabled or write_slave getpw("SYSTEM");
+    echo_enabled and return or write_slave getpw("SYSTEM");
   }
 
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m) {
-    echo_enabled or write_slave getpw("SSH");
+    echo_enabled and return 1 or write_slave getpw("SSH");
   }
   #
   # to extend the functionality of this script, add new elsif blocks
