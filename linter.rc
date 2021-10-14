@@ -14,6 +14,7 @@ case "$LINTER" in
     ;;
   clang-tidy)
     PCRE_PAT='\.(cc?|cpp|hh?)$'
+    LINTER+=' --extra-arg-before -DVERSION=\"0.0\"'
     ;;
   perl)
     XARGS_MAX_FILES=1

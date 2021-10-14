@@ -6,7 +6,14 @@ SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
 
 
-all:	${PROG} isatty ttyname
+all:	${PROG} isatty ttyname echoon echooff
+
+echoon: set_echo.o error.o
+	${LINK.c} -o $@ $^
+	strip $@
+echooff: unset_echo.o error.o
+	${LINK.c} -o $@ $^
+	strip $@
 
 ttyname: ttyname.o
 	${LINK.c} -o $@ $^
@@ -40,7 +47,7 @@ install:all
 
 	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && sudo pip3 install setproctitle )
 
-	cp -f ${PROG} isatty ttyname ${SCRIPTS} ~/bin
+	cp -f ${PROG} isatty ttyname echoon echooff ${SCRIPTS} ~/bin
 
 clean:
 	rm -f ${PROGS} ${TEMPFILES}

@@ -2,6 +2,8 @@
 .ccls-cache/
 ttyname
 isatty
+echoon
+echooff
 pty
 pty-*.tar.gz
 typescript*
