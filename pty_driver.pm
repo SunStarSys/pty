@@ -379,8 +379,6 @@ sub drive (&) {
 
         if (index($_, $clear) >= 0) {
           # don't process window clears (during a redraw).
-          # works well for screen window switching, but still
-          # haven't figured out the right incantation for tmux.
         }
         elsif (! -f "$ptyon_dir/$stty_name") {
           # prevent any further driver processing
