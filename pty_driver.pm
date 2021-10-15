@@ -56,7 +56,7 @@ use constant TTY_READKEY_TIMEOUT  => 0.01;
 
 use constant PTY_AGENT_SOCKET     => "$ENV{HOME}/.pty-agent/socket";
 
-use constant IN_BAND_TOGGLER     => 0; # warning: this has security implications if enabled
+use constant IN_BAND_TOGGLER      => 0; # warning: this has security implications if enabled
 
 =head2 INITIALIZATION
 
