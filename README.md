@@ -101,6 +101,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - disabled insecure IN_BAND_TOGGLER
 
+- full ootb support for tmux, etc.
+
 
 ## Changes with v1.1.8:
 
