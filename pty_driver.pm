@@ -18,7 +18,7 @@ use Fcntl qw/O_NONBLOCK F_SETFL F_GETFL/;
 SOME COMMON SENSE ADVICE: DO NOT RUN UNTRUSTED PROGRAMS, ANYWHERE, IF YOU
 USE THIS WITH SHELLS/SCREEN!
 
-STDIN and STDOUT are dup2'd to a socketpaired (and specifically not pipe2(2)'d because
+STDIN and STDOUT are dup2'd to a socketpair(2)'d (and specifically not pipe2(2)'d because
 IO::Select's select(2) call below doesn't function well on fifos; that's the purpose of
 pselect(2)) Unix Socket by a pty child process. STDIN comes from the SLAVE terminal
 attached to pty's driven process and sent to us. STDOUT is written back to the SLAVE
@@ -362,7 +362,7 @@ sub drive (&) {
       read_input_nb $r or exit;
 
       if ($r != $mterm) {
-        # adust driver activation status vie $ptyon_dir/$stty_name semaphore.
+        # adjust driver activation status vie $ptyon_dir/$stty_name semaphore.
         s{^($PREFIX_RE)$script_name( on| off)(\s)}{
           if ($2 eq " on") {
             no warnings "once";
