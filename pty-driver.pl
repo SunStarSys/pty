@@ -92,6 +92,7 @@ drive {
       my $url = $1;
       my $pw = getpw($url, 1);
       system "('$ENV{MOZILLA}' $url >/dev/null 2>&1 &)" if $pw =~ /y/i;
+      write_master "\r\n";
     }
     return $match;
   }
