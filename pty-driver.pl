@@ -66,7 +66,6 @@ drive {
     # zsh, which behaves appropriately.
     write_slave getpw("SYSTEM");
   }
-
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
   }
@@ -99,6 +98,5 @@ drive {
   else {
     return 0; # not handled by us
   }
-  write_master `clear`;
   return 1; # handled successfully
 }
