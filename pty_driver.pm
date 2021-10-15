@@ -80,6 +80,8 @@ script w/o a controlling master terminal (eg cron apps).
 
 # adjusts toggle input line, matching unsuffixed $0
 my $script_name = basename $0, ".pl";
+
+# better to use this out-of-band toggler in conjunction with the shipped ttyname binary
 my $stty_name = basename $ENV{STTY_NAME};
 my $ptyon_dir = "/tmp/ptyon-$ENV{USER}";
 system "mkdir -m 0700 -p $ptyon_dir && touch $ptyon_dir/$stty_name" and die $!;
