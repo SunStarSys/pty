@@ -52,18 +52,12 @@ drive {
     write_slave getpw("1Password");
   }
   elsif(/^$PREFIX_RE\[ERROR\].* 401 : Unauthorized/m) {
-    # skip to retry
+    # skip to reprompt (on above 1Password login failure)
   }
   elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m and not echo_enabled) {
     write_slave getpw("Vault");
   }
   elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m and not echo_enabled) {
-    # stop here unless echo is off to protect against driver replies
-    # on otherwise matching reads or similar. Note: running a bash
-    # login shell on a remote host over ssh will always disable
-    # echo on the SLAVE terminal, so be careful that you actually
-    # trust the foreign host's executables unless you use
-    # zsh, which behaves appropriately.
     write_slave getpw("SYSTEM");
   }
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
