@@ -48,6 +48,9 @@ drive {
   elsif (/^$PREFIX_RE\b[Pp]assword for '([^']+)':/m and not echo_enabled) {
     write_slave getpw($1);
   }
+  elsif (/^$PREFIX_RE\b(Authentication failed|Acess denied)/) {
+    # skip to retry (git)
+  }
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m and not echo_enabled) {
     write_slave getpw("1Password");
   }
