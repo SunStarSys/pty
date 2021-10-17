@@ -107,7 +107,7 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - STTY_NAME env var to driver cmd
 
-- /tmp/ptyon-$USER/* to mark when driver is enabled
+- /tmp/ptyon-$USER/$(basename $(ttyname 0)) to mark when driver is enabled
 
 - ttyname, echoon, echooff binaries added
 
