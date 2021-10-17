@@ -43,7 +43,7 @@ drive {
     waitpid $pid, 0;
   }
   elsif (/^$PREFIX_RE\bUsername for '([^']+)':/m) {
-    write_slave getpw($1, 0, "Username for %s");
+    write_slave getpw($1, 0, 'Username for "%s"');
   }
   elsif (/^$PREFIX_RE\b[Pp]assword for '([^']+)':/m and not echo_enabled) {
     write_slave getpw($1);

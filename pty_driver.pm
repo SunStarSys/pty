@@ -233,7 +233,7 @@ sub prompt ($;$) {
     ReadMode noecho => $mterm;
   }
   no warnings;
-  write_master sprintf "$format (^D aborts %s):", $type, $script_name; # aborting will terminate pty
+  write_master sprintf "\n$format (^D aborts %s):", $type, $script_name; # aborting will terminate pty
   chomp(my $passwd = ReadLine 0, $mterm);
   defined $passwd or die "Operation aborted";
   ReadMode "ultra-raw" => $mterm;
