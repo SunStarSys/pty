@@ -93,7 +93,7 @@ Do not `make install` as root, it will prevent you from doing so.
 
 ## Changes with v2.0.2:
 
-- custom prompt labels
+- custom prompt formats
 
 - better federation of git password credentials
 
