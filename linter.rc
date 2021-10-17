@@ -30,6 +30,25 @@ case "$LINTER" in
     PCRE_PAT='\.html?$'
     LINTER='sh -c "tidy -utf8 \"\$@\" || [ \$? -eq 1 ]" --'
     ;;
+  typescript)
+    PCRE_PAT='\.ts$'
+    CONFIG_SRC="$(
+      cat .eslintrc.js - 2>/dev/null <<EOF
+module.exports = {
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: [
+    '@typescript-eslint',
+  ],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+};
+EOF
+    )"
+    LINTER='eslint -c $CONFIG_TMP_FILE'
+    ;;
   eslint)
     PCRE_PAT='(?<!\.min)\.js$'
     ;;
