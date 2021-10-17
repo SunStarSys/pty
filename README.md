@@ -93,6 +93,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 ## Changes with v2.0.1:
 
+- echo typed input on any prompt that occurred when the slave term has echo_enabled
+
 
 ## Changes with v2.0.0:
 
