@@ -225,8 +225,12 @@ sub prompt ($) {
   my $type = shift;
   # block these to avoid leaving $mterm in a non-echo state
   local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
-
-  ReadMode noecho => $mterm;
+  if (echo_enabled) {
+    ReadMode restore => $mterm;
+  }
+  else {
+    ReadMode noecho => $mterm;
+  }
   write_master "\n$type Password (^D aborts $script_name): "; # aborting will terminate pty
   no warnings 'uninitialized';
   chomp(my $passwd = ReadLine 0, $mterm);
