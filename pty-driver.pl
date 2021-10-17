@@ -84,7 +84,7 @@ drive {
       $match++;
       next if $url_cache{$1}++;
       my $url = $1;
-      my $pw = getpw($url, 1, "Visit in browser?");
+      my $pw = getpw($url, 1, "Visit in browser [y/N]?");
       system "('$ENV{MOZILLA}' '$url' >/dev/null 2>&1 &)" if $pw =~ /y/i;
       write_master "\r\n";
     }
