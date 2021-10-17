@@ -43,7 +43,7 @@ drive {
     waitpid $pid, 0;
   }
   elsif (/^$PREFIX_RE\bUsername for '([^']+)':/m) {
-    write_slave getpw($1, 0, "Username");
+    write_slave getpw($1, 0, "Username for %s");
   }
   elsif (/^$PREFIX_RE\b[Pp]assword for '([^']+)':/m and not echo_enabled) {
     write_slave getpw($1);
@@ -84,7 +84,7 @@ drive {
       $match++;
       next if $url_cache{$1}++;
       my $url = $1;
-      my $pw = getpw($url, 1, "Visit in browser [y/n]?");
+      my $pw = getpw($url, 1, "Visit %s in browser [y/n]?");
       system "('$ENV{MOZILLA}' '$url' >/dev/null 2>&1 &)" if $pw =~ /y/i;
       write_master "\r\n";
     }

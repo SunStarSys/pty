@@ -223,7 +223,7 @@ Prompt master terminal for a password of a given argument $type and return it.
 
 sub prompt ($;$) {
   my $type = shift;
-  my $label = shift // "Password";
+  my $format = shift // 'Password for "%s"';
   # block these to avoid leaving $mterm in a non-echo state
   local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
   if (echo_enabled) {
@@ -232,8 +232,8 @@ sub prompt ($;$) {
   else {
     ReadMode noecho => $mterm;
   }
-  write_master "\n$type $label (^D aborts $script_name): "; # aborting will terminate pty
-  no warnings 'uninitialized';
+  no warnings;
+  write_master sprintf "$format (^D aborts %s):", $type, $script_name; # aborting will terminate pty
   chomp(my $passwd = ReadLine 0, $mterm);
   defined $passwd or die "Operation aborted";
   ReadMode "ultra-raw" => $mterm;
