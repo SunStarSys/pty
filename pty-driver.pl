@@ -42,11 +42,11 @@ drive {
     write_slave <$out>;
     waitpid $pid, 0;
   }
-  elsif (/^$PREFIX_RE\bUsername for '[^']+':/m) {
-    write_slave getpw("EMAIL");
+  elsif (/^$PREFIX_RE\bUsername for '([^']+)':/m) {
+    write_slave getpw($1, 0, "Username");
   }
-  elsif (/^$PREFIX_RE\b[Pp]assword for '[^']+':/m and not echo_enabled) {
-    write_slave getpw("SYSTEM");
+  elsif (/^$PREFIX_RE\b[Pp]assword for '([^']+)':/m and not echo_enabled) {
+    write_slave getpw($1);
   }
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m and not echo_enabled) {
     write_slave getpw("1Password");
@@ -58,7 +58,7 @@ drive {
     write_slave getpw("Vault");
   }
   elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m and not echo_enabled) {
-    write_slave getpw("SYSTEM");
+    write_slave getpw($ENV{USER});
   }
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
@@ -84,7 +84,7 @@ drive {
       $match++;
       next if $url_cache{$1}++;
       my $url = $1;
-      my $pw = getpw($url, 1);
+      my $pw = getpw($url, 1, "Visit in browser?");
       system "('$ENV{MOZILLA}' $url >/dev/null 2>&1 &)" if $pw =~ /y/i;
       write_master "\r\n";
     }

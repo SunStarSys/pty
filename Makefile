@@ -1,6 +1,6 @@
 include Make.def.clang
 
-VERSION = 2.0.1
+VERSION = 2.0.2-dev
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md

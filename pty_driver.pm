@@ -215,14 +215,15 @@ sub read_input_nb ($) {
   return length;
 }
 
-=item prompt ($)
+=item prompt ($;$)
 
 Prompt master terminal for a password of a given argument $type and return it.
 
 =cut
 
-sub prompt ($) {
+sub prompt ($;$) {
   my $type = shift;
+  my $label = shift // "Password";
   # block these to avoid leaving $mterm in a non-echo state
   local $SIG{INT} = local $SIG{QUIT} = local $SIG{TSTP} = "IGNORE";
   if (echo_enabled) {
@@ -231,7 +232,7 @@ sub prompt ($) {
   else {
     ReadMode noecho => $mterm;
   }
-  write_master "\n$type Password (^D aborts $script_name): "; # aborting will terminate pty
+  write_master "\n$type $label (^D aborts $script_name): "; # aborting will terminate pty
   no warnings 'uninitialized';
   chomp(my $passwd = ReadLine 0, $mterm);
   defined $passwd or die "Operation aborted";
@@ -280,8 +281,8 @@ $(pty-agent) over its secure Unix domain socket, and returns it.
 
 =cut
 
-sub getpw ($;$) {
-  my ($type, $prompt) = @_;
+sub getpw ($;$$) {
+  my ($type, $prompt, $label) = @_;
   index($type, ' ') >= 0
     and die "getpw(): invalid type '$type' contains a space char!";
 
@@ -295,7 +296,7 @@ sub getpw ($;$) {
         and goto NO_SOCKET;
 
     if ($prompt or $saw_pw{$type}++) {
-      my $newvalue = prompt $type;
+      my $newvalue = prompt $type, $label;
       $socket->timed_call(send => "SET $type $newvalue\n");
     }
 
@@ -314,7 +315,7 @@ sub getpw ($;$) {
   }
   else {
   NO_SOCKET:
-    $secret{$type} = prompt $type if $prompt or $saw_pw{$type}++
+    $secret{$type} = prompt $type, $label if $prompt or $saw_pw{$type}++
       or not $secret{$type};
     return "$secret{$type}\n";
   }
