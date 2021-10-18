@@ -91,6 +91,11 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
+## Changes with v2.0.3
+
+- looser echo_enabled test
+
+
 ## Changes with v2.0.2:
 
 - custom prompt formats
