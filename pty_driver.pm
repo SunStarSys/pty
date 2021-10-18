@@ -125,7 +125,7 @@ my $stermios = POSIX::Termios->new;
 sub echo_enabled () {
   $stermios->getattr(SLAVE_TTY_FD);
   my $eflags = (ECHO | ECHOE | ECHONL | ECHOK);
-  return $eflags == ($eflags & $stermios->getlflag);
+  return $eflags & $stermios->getlflag;
 }
 
 # these two subs are here just-in-case they prove useful (not yet so)
