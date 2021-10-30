@@ -63,6 +63,9 @@ drive {
   elsif (/^$PREFIX_RE[Pp]assword(?: for $ENV{USER})?$NSM:/m and not echo_enabled) {
     write_slave getpw($ENV{USER});
   }
+  elsif (/^$PREFIX_RE[Pp]assphrase:/m and not echo_enabled) {
+    write_slave getpw("GPG");
+  }
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
   }
