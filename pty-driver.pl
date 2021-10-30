@@ -16,6 +16,7 @@ use pty_driver;
 
 our $PREFIX_RE;
 our $NSM;
+my $gpg_prompt=0;
 
 drive {
   # this is the actual running program where user-customizable
@@ -64,7 +65,11 @@ drive {
     write_slave getpw($ENV{USER});
   }
   elsif (/^$PREFIX_RE[Pp]assphrase:/m and not echo_enabled) {
-    write_slave getpw("GPG");
+    write_slave getpw("GPG", $gpg_prompt);
+    $gpg_prompt=0;
+  }
+  elsif (/^${PREFIX_RE}gpg:.*[Bb]ad passphrase/m and echo_enabled) {
+    $gpg_prompt=1;
   }
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
