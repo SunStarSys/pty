@@ -95,6 +95,8 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - GPG support.
 
+- pty-agent in-memory encrytion
+
 
 ## Changes with v2.0.2:
 
