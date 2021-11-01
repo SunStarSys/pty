@@ -55,7 +55,7 @@ drive {
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m and not echo_enabled) {
     write_slave getpw("1Password");
   }
-  elsif(/^$PREFIX_RE\[ERROR\].* 401 : Unauthorized/m) {
+  elsif(/^$PREFIX_RE\[ERROR\].* 401 ?: Unauthorized/m) {
     # skip to reprompt (on above 1Password login failure)
   }
   elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m and not echo_enabled) {
