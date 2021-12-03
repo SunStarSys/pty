@@ -51,11 +51,13 @@ and `Term::ReadKey`. `Python3-wise` it just depends on the `setproctitle` module
 
 ## LICENSE
 
+
 1. The licensing on the scripts is the AL-2.0.
 
 2. The licensing on the `C` sources comes from Addison-Wesley's disclaimers on
 code (re)use of [APUE](http://www.kohala.com/start/), since this is a derivative
 work of Stevens' (now deceased) online-published source code.
+
 
 ## INSTRUCTIONS:
 
@@ -88,6 +90,11 @@ Do not `make install` as root, it will prevent you from doing so.
 ```
 
 
+## EXAMPLE:
+
+<https://github.com/joesuf4/home/blob/wsl/.zshrc>
+
+
 # RELEASE NOTES:
 
 
@@ -95,7 +102,7 @@ Do not `make install` as root, it will prevent you from doing so.
 
 - GPG support.
 
-- pty-agent in-memory encrytion
+- pty-agent in-memory encryption
 
 
 ## Changes with v2.0.2:
