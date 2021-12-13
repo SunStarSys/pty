@@ -58,6 +58,8 @@ use constant PTY_AGENT_SOCKET     => "$ENV{HOME}/.pty-agent/socket";
 
 use constant IN_BAND_TOGGLER      => 0; # warning: this has security implications if enabled
 
+use constant READ_LOOP_MAX        => 1024;
+
 =head2 INITIALIZATION
 
 Intitialize pty-agent if necessary. pty-agent sticks around until reboot, and
@@ -208,7 +210,9 @@ sub read_input_nb ($) {
   my $flags = fcntl $r, F_GETFL, 0 or die "fcntl F_GETFL: $!";
   $_ = "";
   fcntl $r, F_SETFL, $flags | O_NONBLOCK or die "fcntl F_SETFL O_NONBLOCK: $!";
+  my $loop;
   while (defined read($r, $_, BUFSIZE, length)) {
+    last if ++$loop == READ_LOOP_MAX;
     select undef, undef, undef, TTY_READKEY_TIMEOUT;
   }
   fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
