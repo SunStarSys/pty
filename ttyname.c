@@ -4,8 +4,13 @@
 
 int main (int argc, char *argv[]) {
   int fd = 0;
+  char *rv;
   if (argc > 1)
     fd = atoi(argv[1]);
-  printf("%s\n", ttyname(fd));
-  return 0;
+  rv = ttyname(fd);
+  if (rv != NULL) {
+    printf("%s\n", rv);
+    return 0;
+  }
+  return 1;
 }

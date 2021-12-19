@@ -88,7 +88,7 @@ drive {
     # accept the default for this apt-get prompt
     write_slave "\n";
   }
-  elsif (exists $ENV{MOZILLA}) {
+  elsif (exists $ENV{MOZILLA} and length $ENV{MOZILLA}) {
     # use a port to evade this url pattern on the command-line (history!)
     my (%url_cache, $match);
     while (m!\b(https://[\w.-]+/[$URI::uric#]+)!g) {
