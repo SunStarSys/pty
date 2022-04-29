@@ -98,6 +98,11 @@ Do not `make install` as root, it will prevent you from doing so.
 # RELEASE NOTES:
 
 
+## Changes with v2.0.4
+
+- python 3.10 support
+
+
 ## Changes with v2.0.3
 
 - GPG support.

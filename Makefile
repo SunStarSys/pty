@@ -1,6 +1,6 @@
 include Make.def.clang
 
-VERSION = 2.0.3
+VERSION = 2.0.4
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
@@ -45,7 +45,7 @@ install:all
 	    && sudo cpan install IO::Select Term::ReadKey URI) \
 	|| (echo "Installation Failed!" >&2 && false)
 
-	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && CFLAGS=-DPY_SSIZE_T_CLEAN sudo -E pip3 install setproctitle pycrypto && ./pty-agent)
+	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && sudo pip3 install setproctitle cryptography && ./pty-agent)
 
 	cp -f ${PROG} isatty ttyname echoon echooff ${SCRIPTS} ~/bin
 
