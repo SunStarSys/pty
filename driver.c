@@ -47,7 +47,8 @@ do_driver(char *driver, char* slave_name)
         sprintf(eslave_name,"STTY_NAME=%s", slave_name);
 
         char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, NULL};
-        __environ = envp;
+        extern char **environ;
+        environ = envp;
 
         execlp(driver, driver, (char *)NULL);
         err_sys("execlp error for: %s", driver);
