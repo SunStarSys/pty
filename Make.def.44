@@ -1,6 +1,6 @@
 # Common make definitions for GNU make under 386BSD.
 
-# Definitions required in all program directories to compile and link
+# definitions required in all program directories to compile and link
 # C programs using gcc.  We also have to get rid of Sun's "-target" options,
 # as gcc doesn't grok it.
 
