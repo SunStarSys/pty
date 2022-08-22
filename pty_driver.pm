@@ -68,7 +68,7 @@ if that's hard to ferret out just use lsof on the socket as below.
 
 =cut
 
-system qq(pgrep -u $ENV{USER} pty-agent >/dev/null 2>&1 || exec pty-agent);
+system qq(pgrep -u $ENV{USER} -f pty-agent >/dev/null 2>&1 || exec pty-agent);
 
 =pod
 
