@@ -74,8 +74,9 @@ drive {
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
   }
-  elsif (/^$PREFIX_RE(?:Verification code)$NSM:/m and not echo_enabled) {
-    write_slave qx(eval "\$(pty -nie -- pty -d pty-driver.pl -- op signin -f 2>&1 | grep '^export ' | tr -d '\r')"; op item get --otp $ENV{OP_TOTP});
+  elsif (/^$PREFIX_RE(?:Verification code|TOTP\(([a-z0-9\@.-]+)\))$NSM:/m and not echo_enabled) {
+    my $tag = defined($1) ? "\u$1" : $ENV{OP_TOTP};
+    write_slave qx(eval "\$(pty -nie -- pty -d pty-driver.pl -- op signin -f 2>&1 | grep '^export ' | tr -d '\r')"; op item get --otp $tag);
   }
   #
   # to extend the functionality of this script, add new elsif blocks
@@ -94,7 +95,7 @@ drive {
   elsif (exists $ENV{MOZILLA} and length $ENV{MOZILLA}) {
     # use a port to evade this url pattern on the command-line (history!)
     my (%url_cache, $match);
-    while (m!\b(https://[\w.-]+/[$URI::uric#]+)!g) {
+    while (m!\b(https://[\w.-]+/[$URI::uric#|]+)!g) {
       $match++;
       next if $url_cache{$1}++;
       my $url = $1;
