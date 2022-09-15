@@ -97,6 +97,10 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+## Changes with v2.1.0
+
+- OnePassword CLI v2.x support for TOTP (google-authenticator-libpam) challenges
+
 
 ## Changes with v2.0.4
 

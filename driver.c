@@ -31,14 +31,19 @@ do_driver(char *driver, char* slave_name)
         close(pipe[0]);
 
         char *user=getenv("USER"), *path=getenv("PATH"), *home=getenv("HOME"),
-          *term=getenv("TERM"), *moz=getenv("MOZILLA"),
+          *term=getenv("TERM"), *moz=getenv("MOZILLA"), *totp=getenv("OP_TOTP"),
           *euser=malloc(strlen(user)+6), *epath=malloc(strlen(path)+6),
           *ehome=malloc(strlen(home)+6), *eterm=malloc(strlen(term)+6),
-          *emoz=NULL, *eslave_name=malloc(strlen(slave_name)+11);
+          *emoz=NULL, *eslave_name=malloc(strlen(slave_name)+11),
+          *etotp=NULL;
 
         if (moz != NULL) {
           emoz=malloc(strlen(moz)+9);
           sprintf(emoz,"MOZILLA=%s", moz);
+        }
+        if (totp != NULL) {
+          etotp=malloc(strlen(totp)+9);
+          sprintf(etotp,"OP_TOTP=%s", totp);
         }
         sprintf(euser,"USER=%s", user);
         sprintf(epath,"PATH=%s", path);
@@ -46,7 +51,7 @@ do_driver(char *driver, char* slave_name)
         sprintf(eterm,"TERM=%s", term);
         sprintf(eslave_name,"STTY_NAME=%s", slave_name);
 
-        char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, NULL};
+        char* envp[] = {euser, epath, ehome, eterm, eslave_name, emoz, etotp, NULL};
         extern char **environ;
         environ = envp;
 

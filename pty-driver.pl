@@ -55,7 +55,7 @@ drive {
   elsif (/^$PREFIX_RE\bEnter the [Pp]assword for/m and not echo_enabled) {
     write_slave getpw("1Password");
   }
-  elsif(/^$PREFIX_RE\[ERROR\].* 401 ?: Unauthorized/m) {
+  elsif(/^$PREFIX_RE\[ERROR\].*\(?401\)? Unauthorized/m) {
     # skip to reprompt (on above 1Password login failure)
   }
   elsif (/^$PREFIX_RE\b[Vv]ault [Pp]assword[^:\n]*:/m and not echo_enabled) {
@@ -73,6 +73,9 @@ drive {
   }
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
+  }
+  elsif (/^$PREFIX_RE(?:Verification code)$NSM:/m and not echo_enabled) {
+    write_slave qx(eval "\$(pty -nie -- pty -d pty-driver.pl -- op signin -f 2>&1 | grep '^export ' | tr -d '\r')"; op item get --otp $ENV{OP_TOTP});
   }
   #
   # to extend the functionality of this script, add new elsif blocks
