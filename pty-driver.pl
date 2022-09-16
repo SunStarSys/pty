@@ -74,7 +74,7 @@ drive {
   elsif (/^$PREFIX_RE(?:Enter passphrase for|Bad passphrase, try again for)$NSM /m and not echo_enabled) {
     write_slave getpw("SSH");
   }
-  elsif (/^$PREFIX_RE(?:Verification code|TOTP\(([a-z0-9\@.-]+)\))$NSM:/m and not echo_enabled) {
+  elsif (/^$PREFIX_RE(?:Verification code|T?OTP\(([a-z0-9\@.-]+)\))$NSM:/m and not echo_enabled) {
     my $tag = defined($1) ? "\u$1" : $ENV{OP_TOTP};
     write_slave qx(eval "\$(pty -nie -- pty -d pty-driver.pl -- op signin -f 2>&1 | grep '^export ' | tr -d '\r')"; op item get --otp $tag);
   }
