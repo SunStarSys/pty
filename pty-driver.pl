@@ -36,7 +36,7 @@ drive {
     # out by toggling the driver off temporarily first.
     write_slave "r\n";
   }
-  elsif (/^$PREFIX_RE\botp-md5 (\d+) (\w+)/m and not echo_enabled) {
+  elsif (/^$PREFIX_RE\botp-(?:md5|sha1) (\d+) (\w+)/m and not echo_enabled) {
     my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
     print $in getpw("OTP");
     close $in;
