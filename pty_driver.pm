@@ -94,12 +94,14 @@ my ($mterm, $sterm);
 for ([\$mterm, MASTER_TTY_FD, sub {ReadMode "ultra-raw" => $mterm}],
      [\$sterm, SLAVE_TTY_FD,  sub {}])
 {
+  ## no critic
   open ${$$_[0]}, "+<&=" . $$_[1]
     or die "Can't open $$_[1]: $!";
   isatty ${$$_[0]} or warn "$$_[1] not a tty!";
   $$_[2]->();
 }
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 sub write_master (;$);
 
 # Die cleanly if called for
@@ -124,6 +126,7 @@ Returns true if the slave terminal has echo enabled.
 
 my $stermios = POSIX::Termios->new;
 
+## no critic
 sub echo_enabled () {
   $stermios->getattr(SLAVE_TTY_FD);
   my $eflags = (ECHO | ECHOE | ECHONL | ECHOK);
@@ -136,7 +139,7 @@ sub disable_echo () {
   $stermios->getattr(SLAVE_TTY_FD);
   $stermios->setlflag($stermios->getlflag & ~(ECHO | ECHOE | ECHONL | ECHOK));
   defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
-  select undef, undef, undef, TTY_READKEY_TIMEOUT;
+  select undef, undef, undef, TTY_READKEY_TIMEOUT; ## no critic
   die "Can't disable echo on slave: $!" if echo_enabled;
 }
 
@@ -144,7 +147,7 @@ sub enable_echo () {
   $stermios->getattr(SLAVE_TTY_FD);
   $stermios->setlflag($stermios->getlflag | (ECHO | ECHOE | ECHONL | ECHOK));
   defined $stermios->setattr(SLAVE_TTY_FD, TCSANOW) or die "setattr failed: $!";
-  select undef, undef, undef, TTY_READKEY_TIMEOUT;
+  select undef, undef, undef, TTY_READKEY_TIMEOUT; ## no critic
   die "Can't enable echo on slave: $!" unless echo_enabled;
 }
 
@@ -213,7 +216,7 @@ sub read_input_nb ($) {
   my $loop;
   while (defined read($r, $_, BUFSIZE, length)) {
     last if ++$loop == READ_LOOP_MAX;
-    select undef, undef, undef, TTY_READKEY_TIMEOUT;
+    select undef, undef, undef, TTY_READKEY_TIMEOUT; ## no critic
   }
   fcntl $r, F_SETFL, $flags or die "fcntl reset: $!";
   return length;

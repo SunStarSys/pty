@@ -22,6 +22,10 @@ case "$LINTER" in
     export STTY_NAME=0
     LINTER='perl -I. -Ilib -c 3<&0'
     ;;
+  perlcritic)
+    XARGS_MAX_FILES=1
+    PCRE_PAT='\.p[ml]$'
+    ;;
   flake8)
     PCRE_PAT='\.py$'
     LINTER+=' --select=E999,E902'
