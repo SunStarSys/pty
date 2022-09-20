@@ -14,27 +14,33 @@ import hashlib
 from cryptography.fernet import Fernet
 import socketserver as SocketServer
 
-SOCKET = '%s/.pty-agent/socket' % os.getenv('HOME')
+SOCKET = "%s/.pty-agent/socket" % os.getenv("HOME")
 
-pw={}
+pw = {}
+
 
 class SecretsHandler(SocketServer.StreamRequestHandler):
     def handle(self):
         global pw
         for line in self.rfile:
             line = line.decode("latin-1")[:-1]
-            if False: pass
-            elif line.startswith('GET '):
+            if False:
+                pass
+            elif line.startswith("GET "):
                 line = line[4:]
                 if line in pw:
-                    self.wfile.write((f.decrypt(pw[line]).decode("latin-1") + "\n").encode("latin-1"))
+                    self.wfile.write(
+                        (f.decrypt(pw[line]).decode("latin-1") + "\n").encode("latin-1")
+                    )
                 else:
                     self.wfile.write("\n".encode("latin-1"))
-            elif line.startswith('SET '):
+            elif line.startswith("SET "):
                 line = line[4:]
-                idx = line.index(' ')
-                pw[line[:idx]] = f.encrypt(line[idx+1:].encode("latin-1"))
-            else: pass
+                idx = line.index(" ")
+                pw[line[:idx]] = f.encrypt(line[idx + 1 :].encode("latin-1"))
+            else:
+                pass
+
 
 def main():
     if os.path.exists(SOCKET) and stat.S_ISSOCK(os.stat(SOCKET).st_mode):
@@ -48,10 +54,11 @@ def main():
     def handler(signum, stackframe):
         pid, exit = os.wait()
         sys.exit(exit)
+
     server = SocketServer.UnixStreamServer(SOCKET, SecretsHandler)
-    if os.fork(): # parent
+    if os.fork():  # parent
         exit
-    else: # child
+    else:  # child
         if os.fork():
             exit
         else:
@@ -63,5 +70,6 @@ def main():
             signal.signal(signal.SIGHUP, signal.SIG_IGN)
             server.serve_forever()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

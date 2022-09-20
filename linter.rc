@@ -26,6 +26,10 @@ case "$LINTER" in
     PCRE_PAT='\.py$'
     LINTER+=' --select=E999,E902'
     ;;
+  black)
+    PCRE_PAT='\.py$'
+    LINTER+=' --check --diff --color'
+    ;;
   tidy)
     PCRE_PAT='\.html?$'
     LINTER='sh -c "tidy -utf8 \"\$@\" || [ \$? -eq 1 ]" --'
