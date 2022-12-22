@@ -97,6 +97,12 @@ Do not `make install` as root, it will prevent you from doing so.
 
 # RELEASE NOTES:
 
+
+## Changes with v3.0.0:
+
+- default to otp-sha2
+
+
 ## Changes with v2.1.1
 
 - Alternate prompt [TOTP(foo):] for google-authenticator-libpam challenges
