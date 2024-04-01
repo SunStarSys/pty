@@ -7,7 +7,7 @@ use strict;
 use warnings FATAL => 'all';
 use IPC::Open2;
 use URI;
-
+use constant OTP_MINIMUM => 10;
 use lib "$ENV{HOME}/bin";
 use pty_driver;
 
@@ -16,7 +16,8 @@ use pty_driver;
 
 our $PREFIX_RE;
 our $NSM;
-my $gpg_prompt=0;
+
+my $gpg_prompt = 0;
 
 drive {
   # this is the actual running program where user-customizable
@@ -36,12 +37,37 @@ drive {
     # out by toggling the driver off temporarily first.
     write_slave "r\n";
   }
-  elsif (/^$PREFIX_RE\botp-(?:md5|sha1) (\d+) (\w+)/m and not echo_enabled) {
-    my $pid = open2 my $out, my $in, "ortcalc $1 $2 2>&-";
-    print $in getpw("OTP");
+  elsif (/^$PREFIX_RE\botp-sha1 (\d+) (\w+)/m and not echo_enabled) {
+    my ($idx, $salt) = ($1, $2);
+    my $pid = open2 my $out, my $in, "otp-sha1 $idx $salt 2>&-";
+    my $pw = getpw("OTP");
+    print $in $pw;
     close $in;
     write_slave <$out>;
+    close $out;
     waitpid $pid, 0;
+    if (--$idx < OTP_MINIMUM) {
+      my $cpid = open2 my $cout, my $cin, "otp-sha1 $idx $salt 2>&-" or die "Can't popen otp-sha1: $!";
+      print $cin $pw;
+      close $cin;
+      my $result = join "", <$cout>;
+      close $cout;
+      waitpid $cpid, 0;
+      $pid = open2 $out, $in, "pty -ie ortpasswd 2>&1" or die "Can't popen ortpasswd: $!";
+      scalar <$out>; # Password:
+      $|=1, select $_ for select $in;
+      print $in $result;
+      scalar <$out>; # Password:
+      s/^.*(otp-sha1 \d+ \w+).*$/$1/ or die "Bad challenge: $_" for my $challenge = <$out>;
+      $cpid = open2 $cout, $cin, "$challenge 2>&-" or die "Can't popen $challenge: $!";
+      print $cin $pw;
+      close $cin;
+      print $in join "", <$cout>;
+      close $in;
+      waitpid $cpid, 0;
+      waitpid $pid, 0;
+    }
+    undef $pw;
   }
   elsif (/^$PREFIX_RE\bUsername for '([^']+)':/m) {
     write_slave getpw($1, 0, 'Username for "%s"');

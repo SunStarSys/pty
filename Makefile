@@ -1,4 +1,4 @@
-include Make.def.clang
+include Make.def.sun
 
 VERSION = 2.1.2-dev
 PROG = pty
