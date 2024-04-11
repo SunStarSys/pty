@@ -48,7 +48,7 @@ ssize_t  readn(int, void *, size_t);/* {Prog readn} */
 ssize_t  writen(int, const void *, size_t);/* {Prog writen} */
 int daemon_init(void);   /* {Prog daemoninit} */
 
-int s_pipe(int *);    /* {Progs svr4_spipe bsd_spipe} */
+int s_pipe(int[2]);    /* {Progs svr4_spipe bsd_spipe} */
 int recv_fd(int, ssize_t (*func)(int, const void *, size_t));
          /* {Progs recvfd_svr4 recvfd_43bsd} */
 int send_fd(int, int);   /* {Progs sendfd_svr4 sendfd_43bsd} */
