@@ -1,6 +1,6 @@
 include Make.def.sun
 
-VERSION = 2.1.2
+VERSION = 3.0.0
 PROG = pty
 SCRIPTS = pty-agent pty_driver.pm pty-driver.pl script.sh
 MANIFEST= *.c *.h ${SCRIPTS} Make* README.md
