@@ -37,6 +37,14 @@ drive {
     # out by toggling the driver off temporarily first.
     write_slave "r\n";
   }
+  elsif (/^$PREFIX_RE\: p (.+)/m and echo_enabled) {
+    no warnings;
+    local ($@, $_);
+    $_ = $1;
+    s/[^[:print:]].*$//mg;
+    s/\[\w+\].*$//mg;
+    write_master("\r\n$_\r\n$@\r\n") for scalar eval;
+  }
   elsif (/^$PREFIX_RE\botp-sha1 (\d+) (\w+)/m and not echo_enabled) {
     my ($idx, $salt) = ($1, $2);
     my $pid = open2 my $out, my $in, "otp-sha1 $idx $salt 2>&-";
