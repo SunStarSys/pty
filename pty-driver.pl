@@ -40,6 +40,7 @@ drive {
   elsif (/^$PREFIX_RE\: ([Pp]) (.+)/m and echo_enabled) {
     no warnings;
     no strict;
+    require Cwd;
     local ($@, $_, @_);
     local $SIG{__DIE__} = sub { die shift };
     $_ = $2;
