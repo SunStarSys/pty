@@ -39,6 +39,7 @@ drive {
   }
   elsif (/^$PREFIX_RE\: p (.+)/m and echo_enabled) {
     no warnings;
+    no strict;
     local ($@, $_);
     $_ = $1;
     s/[^[:print:]].*$//mg;
