@@ -41,6 +41,7 @@ drive {
     no warnings;
     no strict;
     local ($@, $_);
+    local $SIG{__DIE__} = sub { die shift };
     $_ = $1;
     s/[^[:print:]].*$//mg;
     s/\[\w+\]\s*$//mg;
