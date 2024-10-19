@@ -42,7 +42,7 @@ drive {
     local ($@, $_);
     $_ = $1;
     s/[^[:print:]].*$//mg;
-    s/\[\w+\].*$//mg;
+    s/\[\w+\]\s*$//mg;
     write_master("\r\n$_\r\n$@\r\n") for scalar eval;
   }
   elsif (/^$PREFIX_RE\botp-sha1 (\d+) (\w+)/m and not echo_enabled) {
