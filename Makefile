@@ -45,7 +45,7 @@ install:all
 	    && sudo cpan install IO::Select Term::ReadKey URI) \
 	|| (echo "Installation Failed!" >&2 && false)
 
-	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo install python3-pip) && sudo pip3 install setproctitle cryptography && ./pty-agent)
+	@pkill -u $$USER pty-agent; ./pty-agent || ( ([ -x $$(which pip3) ] || sudo apt install python3-pip) && sudo pip3 install setproctitle cryptography --break-system-packages && ./pty-agent)
 
 	cp -f ${PROG} isatty ttyname echoon echooff ${SCRIPTS} ~/bin
 
